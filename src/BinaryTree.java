@@ -23,6 +23,17 @@ public class BinaryTree {
 
     }
 
+    public String classifyNode(){
+
+        return "TBD";
+    }
+
+    public void addSplit(Node n, String category, int val){
+        //add split
+    }
+    public void pruneNode(Node n){
+        //prune shit
+    }
 
 
 
