@@ -15,7 +15,13 @@ public class BinaryTree {
 
     ArrayList<String> categories = new ArrayList<String>();
 
-    //public  static void main(
+    Integer min_leaf_size = 0;
+
+    public BinaryTree(ArrayList<String> categories, int min_leaf_size){
+        categories = categories;
+        min_leaf_size = min_leaf_size;
+
+    }
 
 
 
