@@ -23,8 +23,7 @@ public class DataSource {
     public DataSource(String source, int[] numericalCategoires, int[] categoricalCategories, int
             classfiedVariable) {
         try {
-            CSVReader reader = new CSVReader(new FileReader
-                    ("Data/CreditCards/credit-data.csv"));
+            CSVReader reader = new CSVReader(new FileReader("Data/CreditCards/credit-data.csv"));
 
             // Checking the rows of credit data
             String[] creditRows = {};
