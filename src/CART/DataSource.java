@@ -61,7 +61,7 @@ public class DataSource {
                     passedFirst = true;
                 }
             }
-            System.out.print(data.toString());
+            //System.out.print(data.toString());
             dataNames = creditRows;
 
         } catch (FileNotFoundException e) {
@@ -87,10 +87,6 @@ public class DataSource {
         else return null;
     }
 
-    public List<Datapoint> getPoints(){
-
-        return data;
-    }
     //public List<Datapoint> getPoints(int [] indexes){
 
         //return data.get(indexes);
@@ -121,7 +117,7 @@ public class DataSource {
         }
 
         public String toString() {
-            String output = "Datapoint: Numbers:{" +numericalData.toString()+"}, Categories " +
+            String output = "Datapoint:"+classification+" Numbers:{" +numericalData.toString()+"}, Categories " +
                     "={"+categoricalData.toString()+"}";
             return output;
         }
