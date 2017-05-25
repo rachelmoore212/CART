@@ -20,10 +20,11 @@ public class DataSource {
     private String[] dataNames;
 
 
-    public DataSource(String source, int[] numericalCategoires, int[] categoricalCategories) {
+    public DataSource(String source, int[] numericalCategoires, int[] categoricalCategories, int
+            classfiedVariable) {
         try {
             CSVReader reader = new CSVReader(new FileReader
-                    ("/Users/jamie/Documents/College/Senior/DataMining/Final Project/CART/Data/CreditCards/credit-data.csv"));
+                    ("Data/CreditCards/credit-data.csv"));
 
             // Checking the rows of credit data
             String[] creditRows = {};
@@ -52,7 +53,7 @@ public class DataSource {
                             categorical.add(s[i]);
                         }
 
-                        data.add(new Datapoint(numerical, categorical));
+                        data.add(new Datapoint(numerical, categorical, s[classfiedVariable]));
                     } else {
                         creditRows = s;
                     }
@@ -87,13 +88,25 @@ public class DataSource {
         else return null;
     }
 
+    public List<Datapoint> getPoints(){
+
+        return data;
+    }
+    //public List<Datapoint> getPoints(int [] indexes){
+
+        //return data.get(indexes);
+    //}
+
+
     public final class Datapoint {
         List<Double> numericalData;
         List<String> categoricalData;
+        String classification;
 
-        public Datapoint(List<Double> numerical, List<String> categorical) {
+        public Datapoint(List<Double> numerical, List<String> categorical, String classification) {
             this.numericalData = numerical;
             this.categoricalData = categorical;
+            this.classification = classification;
         }
 
         public List<Double> getNumericalData() {
@@ -102,6 +115,10 @@ public class DataSource {
 
         public List<String> getCategoricalData() {
             return categoricalData;
+        }
+
+        public String getClassification(){
+            return classification;
         }
 
         public String toString() {
