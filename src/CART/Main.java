@@ -71,23 +71,33 @@ public class Main {
                     // Check if value at category is a key
                     if(classify_map.containsKey(value)) {
                         int[] classify_array = classify_map.get(value);
-                        //if (cat_data.getClass() == "0"){
+                        if (cat_data.getClass().equals("0")) {
+                            classify_array[0]++;
+                        } else {
+                            classify_array[1]++;
+                        }
 
-                        //}
-                        //if cat_data.get
-                        // add it if its not
                     } else {
-                        int [] new_list = new int [] {0,0};
-                        //new_list.add(data);
-                        //classify_map.put(value, new_list);
+                        int [] classify_array = new int [] {0,0};
+                        if (cat_data.getClass().equals("0")) {
+                            classify_array[0]++;
+                        } else {
+                            classify_array[1]++;
+                        }
+                        classify_map.put(value, classify_array);
                     }
                     // if category is not a key already, add it
                 } else {
                     Map<String, int[]> new_map = new Hashtable<>();
                     String value = cat_data.get(i);
-                    List<DataSource.Datapoint> new_list = new ArrayList<>();
-                    //new_map.put(value, new_list);
-                   // categories_to_points.put(i, new_map);
+                    int [] classify_array = new int [] {0,0};
+                    if (cat_data.getClass().equals("0")) {
+                        classify_array[0]++;
+                    } else {
+                        classify_array[1]++;
+                    }
+                    new_map.put(value, classify_array);
+                    categories_to_classifications.put(i, new_map);
                 }
 
             }
