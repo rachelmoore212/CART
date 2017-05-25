@@ -31,24 +31,24 @@ public class BinaryTree {
         return "TBD";
     }
 
-    public void addCategoricalSplit(Node node, int category){
-        node.setCategoricalRule(category);
-        Node left_node = new Node(false);
-        Node right_node = new Node(false);
-        node.setLeft_node(left_node);
-        node.setRight_node(right_node);
-        node_list.add(left_node);
-        node_list.add(right_node);
-    }
-    public void addNumericSplit(Node node, int value){
-        node.setNumericRule(value);
-        Node left_node = new Node(false);
-        Node right_node = new Node(false);
-        node.setLeft_node(left_node);
-        node.setRight_node(right_node);
-        node_list.add(left_node);
-        node_list.add(right_node);
-    }
+//    public void addCategoricalSplit(Node node, int category){
+//        node.setCategoricalRule(category);
+//        Node left_node = new Node(false);
+//        Node right_node = new Node(false);
+//        node.setLeft_node(left_node);
+//        node.setRight_node(right_node);
+//        node_list.add(left_node);
+//        node_list.add(right_node);
+//    }
+//    public void addNumericSplit(Node node, int value){
+//        node.setNumericRule(value);
+//        Node left_node = new Node(false);
+//        Node right_node = new Node(false);
+//        node.setLeft_node(left_node);
+//        node.setRight_node(right_node);
+//        node_list.add(left_node);
+//        node_list.add(right_node);
+//    }
     public boolean traverse(DataSource.Datapoint data){
 
         Node current = start_node;
@@ -66,7 +66,7 @@ public class BinaryTree {
 
         }
 
-        return false
+        return false;
     }
 
     public void pruneNode(Node n){
