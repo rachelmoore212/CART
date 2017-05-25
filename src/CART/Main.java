@@ -9,6 +9,7 @@ public class Main {
 
         System.out.println("hello world");
         DataSource d = new DataSource("/Users/jamie/Documents/College/Senior/DataMining/Final " +
-                "Project/CART/Data/CreditCards/credit-data.csv");
+                "Project/CART/Data/CreditCards/credit-data.csv",new int[]{10,10,2,5,30,65},new
+                int[]{1,2,3,4});
     }
 }
