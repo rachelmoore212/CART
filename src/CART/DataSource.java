@@ -1,17 +1,12 @@
 package CART;
 
 import au.com.bytecode.opencsv.CSVReader;
-import com.sun.deploy.util.ArrayUtil;
-import com.sun.tools.javac.util.ArrayUtils;
-import com.sun.xml.internal.ws.util.StreamUtils;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by jamie on 5/21/17.
@@ -92,7 +87,7 @@ public class DataSource {
         else return null;
     }
 
-    public class Datapoint {
+    public final class Datapoint {
         List<Double> numericalData;
         List<String> categoricalData;
 
