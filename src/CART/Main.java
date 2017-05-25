@@ -71,6 +71,9 @@ public class Main {
                     // Check if value at category is a key
                     if(classify_map.containsKey(value)) {
                         int[] classify_array = classify_map.get(value);
+                        //if (cat_data.getClass() == "0"){
+
+                        //}
                         //if cat_data.get
                         // add it if its not
                     } else {
