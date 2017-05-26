@@ -16,6 +16,10 @@ public class Main {
         DataSource source = new DataSource("Data/CreditCards/credit-data.csv",numeric_indexes,
                 categorical_indexes, 24);
 
+        DataSource crossValidation = source.splitDataset(0.2);
+
+        ClassifierModel model = new ClassifierModel(source, 10);
+
         //mapData(source.getData());
     }
 

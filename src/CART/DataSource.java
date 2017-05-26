@@ -6,26 +6,16 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by jamie on 5/21/17.
  */
 public class DataSource {
-    public List<Datapoint> getData() {
-        return data;
-    }
 
     private List<Datapoint> data = new ArrayList<>();
-
-    public String[] getDataNumericalnames() {
-        return dataNumericalnames;
-    }
-
-    public String[] getDataCategorialNames() {
-        return dataCategorialNames;
-    }
-
     private String[] dataCategorialNames;
     private String[] dataNumericalnames;
 
@@ -90,17 +80,28 @@ public class DataSource {
         }
     }
 
-    public DataSource(List<Datapoint> splitData) {
+    public DataSource(List<Datapoint> splitData, String[] dataCategorialNames, String[] dataNumericalnames) {
         this.data = splitData;
+        this.dataCategorialNames = dataCategorialNames;
+        this.dataNumericalnames = dataNumericalnames;
     }
 
     //Method that partitions the array into smaller chunks probablilistially for the purposes of
     // training
     public DataSource splitDataset(double factor) {
         if ((factor > 0)&& (factor < 1)) {
-            DataSource output = new DataSource(new ArrayList<Datapoint>());
-            //TODO do the acutal partitioning of the dataset
+            if (factor<(1.0/data.size())) {
+                factor = 1.0/data.size();
+            }
+            if (factor>(1.0-(1.0/data.size()))) {
+                factor = 1.0-1.0/data.size();
+            }
+            Collections.shuffle(data);
 
+            List<Datapoint> newData = data.subList(0, (int)(data.size()*1.0* factor));
+            data = data.subList((int)(data.size()*1.0* factor), data.size());
+
+            DataSource output = new DataSource(newData, dataCategorialNames, dataNumericalnames);
             return output;
         }
         else return null;
@@ -140,5 +141,16 @@ public class DataSource {
                     "={"+categoricalData.toString()+"}";
             return output;
         }
+    }
+    public String[] getDataNumericalnames() {
+        return dataNumericalnames;
+    }
+
+    public String[] getDataCategorialNames() {
+        return dataCategorialNames;
+    }
+
+    public List<Datapoint> getData() {
+        return data;
     }
 }
