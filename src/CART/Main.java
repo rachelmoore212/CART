@@ -13,8 +13,7 @@ public class Main {
 
 
         System.out.println("hello world");
-        DataSource d = new DataSource("/Users/jamie/Documents/College/Senior/DataMining/Final " +
-                "Project/CART/Data/CreditCards/credit-data.csv",numeric_indexes,categorical_indexes);
+        DataSource d = new DataSource("/Data/CreditCards/credit-data.csv",numeric_indexes,categorical_indexes,24);
     }
 
     /*public double[] getBestCategoricalSplit(List<DataSource.Datapoint> data){
