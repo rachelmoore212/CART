@@ -11,7 +11,7 @@ import java.util.*;
 public class BinaryTree {
 
 
-    public ArrayList<Node>  node_list = new ArrayList<Node>();
+    public ArrayList<Node> node_list = new ArrayList<Node>();
 
     public Node start_node = new Node(true);
 
@@ -19,7 +19,7 @@ public class BinaryTree {
 
     public Integer min_leaf_size = 0;
 
-    public BinaryTree(DataSource dataSource, int min_leaf){
+    public BinaryTree(DataSource dataSource, int min_leaf) {
 
         int num_categories = dataSource.getDataCategorialNames().length;
         int num_numeric = dataSource.getDataNumericalnames().length;
@@ -28,35 +28,72 @@ public class BinaryTree {
         Node start_node = new Node(true);
 
 
-
-
-
-
-
     }
-    public String classifyNode(List<DataSource.Datapoint> datapoints, int num_cat, int num_numeric){
+
+    public String classifyNode(List<DataSource.Datapoint> datapoints, int num_cat, int num_numeric) {
 
         Map[] map_list = mapData(datapoints);
         Map<Integer, Map<String, List<DataSource.Datapoint>>> categories_to_points = map_list[0];
 
         Map<Integer, Map<String, int[]>> categories_to_classifications = map_list[1];
 
-        Double[] categorical_ginis = new Double[num_cat];
+        //Double[] categorical_ginis = new Double[num_cat];
+        double most_min_gini = 1000;
+        int best_gini_index = -1;
+        Set<String> very_best_comb = new HashSet<>();
+
         Double[] numeric_ginis = new Double[num_numeric];
 
-        for (int i = 0; i < num_cat; i++){
+        for (int i = 0; i < num_cat; i++) {
             //Double[] ginis = new Double[(int)Math.pow(2, categories_to_classifications.get(i).keySet().size())-1];
             double min_gini = 1000;
+            Set<String> best_comb = new HashSet<>();
             Map<String, int[]> attribute_map = categories_to_classifications.get(i);
             Set<String> keys = attribute_map.keySet();
             List<Set<String>> combinations = getSubsets(keys);
+            for (Set<String> comb : combinations) {
+                if (comb.size() < Math.ceil(keys.size() / 2)) {
+                    int sum_left_0 = 0;
+                    int sum_left_1 = 0;
+                    int sum_right_0 = 0;
+                    int sum_right_1 = 0;
+                    for (String key : keys) {
+                        if (comb.contains(key)) {
+                            sum_left_0 = sum_left_0 + attribute_map.get(key)[0];
+                            sum_left_1 = sum_left_1 + attribute_map.get(key)[1];
+                        } else {
+                            sum_right_0 = sum_right_0 + attribute_map.get(key)[0];
+                            sum_right_1 = sum_right_1 + attribute_map.get(key)[1];
+                        }
+                    }
+                    double gini = 1000;
+                    if (((sum_left_0 + sum_left_1) < min_leaf_size )||((sum_right_0 + sum_right_1) < min_leaf_size)){
+                        gini = 1000;
+                    } else {
+                        gini = ClassifierModel.GINI(sum_left_0, sum_left_1) + ClassifierModel.GINI(sum_right_0, sum_right_1);
+                    }
+                    if (gini < min_gini) {
+                        min_gini = gini;
+                        best_comb = comb;
+                    }
+                }
+
+            }
+            if (min_gini < most_min_gini) {
+                most_min_gini = min_gini;
+                very_best_comb = best_comb;
+                best_gini_index = i;
+            }
         }
+
+        // Here will be code for finding best numeric split
 
         return "TBD";
     }
 
     /**
      * Method that calucaltes all the subsets of a particular subset array for
+     *
      * @param attributes
      * @return
      */
@@ -68,8 +105,7 @@ public class BinaryTree {
 
         // Run a loop for printing all 2^n
         // subsets one by obe
-        for (int i = 0; i < (1<<n); i++)
-        {
+        for (int i = 0; i < (1 << n); i++) {
             Set<String> toadd = new HashSet<>();
 
             //
@@ -179,8 +215,7 @@ public class BinaryTree {
     }
 
 
-
-    public void addCategoricalSplit(Node node, int category_index, String[] category){
+    public void addCategoricalSplit(Node node, int category_index, String[] category) {
         node.setCategoricalRule(category_index, category);
         Node left_node = new Node(false);
         Node right_node = new Node(false);
@@ -189,7 +224,8 @@ public class BinaryTree {
         node_list.add(left_node);
         node_list.add(right_node);
     }
-    public void addNumericSplit(Node node, int index, int value){
+
+    public void addNumericSplit(Node node, int index, int value) {
         node.setNumericRule(index, value);
         Node left_node = new Node(false);
         Node right_node = new Node(false);
@@ -198,13 +234,14 @@ public class BinaryTree {
         node_list.add(left_node);
         node_list.add(right_node);
     }
-    public String traverse(DataSource.Datapoint data){
+
+    public String traverse(DataSource.Datapoint data) {
 
         Node current = start_node;
 
-        while (current.isLeaf == false){
+        while (current.isLeaf == false) {
 
-            if (current.isCategorical == true){
+            if (current.isCategorical == true) {
                 int index = current.category_value;
                 //if (data[index] == current.getMove_left_categorical()){
 
@@ -212,13 +249,12 @@ public class BinaryTree {
             }
 
 
-
         }
 
         return "false";
     }
 
-    public void pruneNode(Node n){
+    public void pruneNode(Node n) {
         //prune shit
     }
 
@@ -235,16 +271,14 @@ public class BinaryTree {
         public Node right_node;
 
 
-
-
-        public Node(boolean start){
+        public Node(boolean start) {
 
             isStart = start;
             isLeaf = true;
 
         }
 
-        public void setCategoricalRule(int index, String[] categories){
+        public void setCategoricalRule(int index, String[] categories) {
             isLeaf = false;
             isCategorical = true;
             category_value = index;
@@ -252,12 +286,13 @@ public class BinaryTree {
 
         }
 
-        private void setNumericRule(int index, int value){
+        private void setNumericRule(int index, int value) {
             isLeaf = false;
             isCategorical = false;
             numeric_value = index;
             move_left_less_than = value;
         }
+
         public boolean isStart() {
             return isStart;
         }
@@ -281,7 +316,6 @@ public class BinaryTree {
         public void setCategorical(boolean categorical) {
             isCategorical = categorical;
         }
-
 
 
         public void setMove_left_less_than(int move_left_less_than) {
