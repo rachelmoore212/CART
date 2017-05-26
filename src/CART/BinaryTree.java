@@ -198,24 +198,9 @@ public class BinaryTree {
         node_list.add(left_node);
         node_list.add(right_node);
     }
-    public String traverse(DataSource.Datapoint data){
 
-        Node current = start_node;
-
-        while (current.isLeaf == false){
-
-            if (current.isCategorical == true){
-                int index = current.category_value;
-                //if (data[index] == current.getMove_left_categorical()){
-
-                //}
-            }
-
-
-
-        }
-
-        return "false";
+    public String findAssignment(DataSource.Datapoint datapoint) {
+        return start_node.traverse(datapoint);
     }
 
     public void pruneNode(Node n){
@@ -227,15 +212,38 @@ public class BinaryTree {
         public boolean isStart = false;
         public boolean isLeaf = true;
         public boolean isCategorical = false;
+        public String assignedValue = "";
         public int category_value = 0;
-        public int numeric_value = 0;
         public String[] move_left_categorical = {};
         public double move_left_less_than = 0;
         public Node left_node;
         public Node right_node;
 
 
+        public String traverse(DataSource.Datapoint data) {
+            //Return true if it is a leaf node
+            if (isLeaf) {
+                return assignedValue;
+            }
 
+            // Otherwise traverse based on the rule
+            if (isCategorical == true) {
+                int index = category_value;
+                String[] leftMove = move_left_categorical;
+                for (String s : leftMove) {
+                    if (data.getCategoricalData().get(index).equals(s)) {
+                        return left_node.traverse(data);
+                    }
+                }
+                return right_node.traverse(data);
+
+            } else {//TODO be very sure about less than or equal to
+                if (data.getNumericalData().get(category_value) =< move_left_less_than) {
+                    return left_node.traverse(data);
+                }
+                return right_node.traverse(data);
+            }
+        }
 
         public Node(boolean start){
 
@@ -255,7 +263,7 @@ public class BinaryTree {
         private void setNumericRule(int index, int value){
             isLeaf = false;
             isCategorical = false;
-            numeric_value = index;
+            category_value = index;
             move_left_less_than = value;
         }
         public boolean isStart() {
@@ -270,8 +278,9 @@ public class BinaryTree {
             return isLeaf;
         }
 
-        public void setLeaf(boolean leaf) {
-            isLeaf = leaf;
+        public void setLeaf(String assignedValue) {
+            isLeaf = true;
+            this.assignedValue = assignedValue;
         }
 
         public boolean isCategorical() {
@@ -304,7 +313,6 @@ public class BinaryTree {
             this.right_node = right_node;
         }
     }
-
 
 }
 
