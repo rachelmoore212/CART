@@ -17,7 +17,17 @@ public class DataSource {
     }
 
     private List<Datapoint> data = new ArrayList<>();
-    private String[] dataNames;
+
+    public String[] getDataNumericalnames() {
+        return dataNumericalnames;
+    }
+
+    public String[] getDataCategorialNames() {
+        return dataCategorialNames;
+    }
+
+    private String[] dataCategorialNames;
+    private String[] dataNumericalnames;
 
 
     public DataSource(String source, int[] numericalCategoires, int[] categoricalCategories, int
@@ -32,6 +42,8 @@ public class DataSource {
                 passedFirst = false;
                 creditRows = null;
             }
+            dataCategorialNames = new String[categoricalCategories.length];
+            dataNumericalnames = new String[numericalCategoires.length];
 //            List<Integer> toNumber = Arrays.stream(numericalCategoires).boxed().collect(Collectors
 //                    .<Integer>toList());
 
@@ -55,13 +67,20 @@ public class DataSource {
                         data.add(new Datapoint(numerical, categorical, s[classfiedVariable]));
                     } else {
                         creditRows = s;
+                        for (int i: numericalCategoires){
+                            dataNumericalnames[i] = s[numericalCategoires[i]];
+                        }
+                        for (int i: categoricalCategories){
+                            dataCategorialNames[i] = s[categoricalCategories[i]];
+                        }
+
                     }
 
                 } else{
                     passedFirst = true;
                 }
             }
-            System.out.print(data.toString());
+            //System.out.print(data.toString());
             dataNames = creditRows;
 
         } catch (FileNotFoundException e) {
@@ -87,10 +106,6 @@ public class DataSource {
         else return null;
     }
 
-    public List<Datapoint> getPoints(){
-
-        return data;
-    }
     //public List<Datapoint> getPoints(int [] indexes){
 
         //return data.get(indexes);
@@ -121,7 +136,7 @@ public class DataSource {
         }
 
         public String toString() {
-            String output = "Datapoint: Numbers:{" +numericalData.toString()+"}, Categories " +
+            String output = "Datapoint:"+classification+" Numbers:{" +numericalData.toString()+"}, Categories " +
                     "={"+categoricalData.toString()+"}";
             return output;
         }
