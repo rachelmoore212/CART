@@ -30,7 +30,8 @@ public class BinaryTree {
 
     }
 
-    public String classifyNode(List<DataSource.Datapoint> datapoints, int num_cat, int num_numeric) {
+    public void classifyNode(Node n, List<DataSource.Datapoint> datapoints, int num_cat, int
+            num_numeric) {
 
         Map[] map_list = mapData(datapoints);
         Map<Integer, Map<String, List<DataSource.Datapoint>>> categories_to_points = map_list[0];
@@ -38,9 +39,21 @@ public class BinaryTree {
         Map<Integer, Map<String, int[]>> categories_to_classifications = map_list[1];
 
         //Double[] categorical_ginis = new Double[num_cat];
-        double most_min_gini = 1000;
+        //Calculating the total size of the keys in the dataset
+        int[] canonvalues = new int[2];
+        Map<String, int[]> internalmap= categories_to_classifications.get
+                (categories_to_classifications.keySet().iterator().next());
+        for (int[] entry : internalmap.values()) {
+            for (int i = 0; i<entry.length; i++){
+                canonvalues[i] += entry[i];
+            }
+        }
+
+        // Setting the GINI to its current value
+        double most_min_gini = ClassifierModel.GINI(canonvalues[0],canonvalues[1]);
         int best_gini_index = -1;
         Set<String> very_best_comb = new HashSet<>();
+        double splitValue = 0;
 
         Double[] numeric_ginis = new Double[num_numeric];
 
@@ -86,10 +99,105 @@ public class BinaryTree {
             }
         }
 
-        // Here will be code for finding best numeric split
+        //Now testing all the numerical attributes
+        for (int i = 0; i < num_numeric; i++) {
+            int sum_left_0 = 0;
+            int sum_left_1 = 0;
+            int sum_right_0 = canonvalues[0];
+            int sum_right_1 = canonvalues[1];
 
-        return "TBD";
+            final int finalI = i;
+            Collections.sort(datapoints, ((o1, o2) -> {
+                return o1.getNumericalData().get(finalI).compareTo(o2
+                        .getNumericalData().get(finalI));
+            }));
+
+            double lastVlaue = -1212341.1234123;//TODO bullshit
+            for(int pointer = 0; pointer < datapoints.size(); pointer++) {
+                if (datapoints.get(pointer).getClassification().equals("0")) {
+                    sum_left_0++;
+                    sum_right_0--;
+                } else {
+                    sum_left_1++;
+                    sum_right_1--;
+                }
+                double value = datapoints.get(pointer).getNumericalData().get(i);
+                if (value != lastVlaue) {
+                    lastVlaue = value;
+                    if ((pointer+1>=min_leaf_size)&&(pointer<(datapoints.size()-min_leaf_size))) {
+                        double gini = ClassifierModel.GINI(sum_left_0, sum_left_1) + ClassifierModel
+                                .GINI(sum_right_0, sum_right_1);
+
+                        if (gini < most_min_gini) {
+                            most_min_gini = gini;
+                            very_best_comb.clear();
+                            best_gini_index = i;
+                            splitValue = value;
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        // Here will be code for finding best numeric split
+        if (!(most_min_gini<ClassifierModel.GINI(canonvalues[0],canonvalues[1]))) {
+            String assignedValue = "1";
+            if (canonvalues[0]>canonvalues[1]) {//TODO make this robust for many assignments
+                assignedValue = "0";
+            }
+            n.setLeaf(assignedValue);
+            return;
+        }
+
+        List<DataSource.Datapoint> new_data_left;
+        List<DataSource.Datapoint> new_data_right;
+
+        if (very_best_comb.isEmpty()) {
+            addNumericSplit(n, best_gini_index, splitValue);
+            //get list of data
+            new_data_left = new ArrayList<>();
+            new_data_right = new ArrayList<>();
+            for (DataSource.Datapoint data : datapoints) {
+                if (data.getNumericalData().get(best_gini_index) <= splitValue) {
+                    new_data_left.add(data);
+                } else {
+                    new_data_right.add(data);
+                }
+            }
+        } else {
+            addCategoricalSplit(n, best_gini_index, very_best_comb);
+            new_data_left = new ArrayList<>();
+            new_data_right = new ArrayList<>();
+            Map<String, List<DataSource.Datapoint>> mapped_points = categories_to_points.get
+                    (best_gini_index);
+            for (String key : mapped_points.keySet()) {
+                if (very_best_comb.contains(key)) {
+                    new_data_left.addAll(mapped_points.get(key));
+                } else {
+                    new_data_right.addAll(mapped_points.get(key));
+                }
+
+            }
+
+        }
+
+        Node left = n.getLeft_node();
+        Node right = n.getRight_node();
+        classifyNode(left, new_data_left, num_cat, num_numeric);
+        classifyNode(right, new_data_right, num_cat, num_numeric);
+
     }
+
+//    /**
+//     * Method that pefroms the voting of datapoints in the classifcation
+//     * @param datapoints
+//     * @return
+//     */
+//    public String decideClassification(List<DataSource.Datapoint> datapoints){
+//
+//    }
 
     /**
      * Method that calucaltes all the subsets of a particular subset array for
@@ -215,7 +323,7 @@ public class BinaryTree {
     }
 
 
-    public void addCategoricalSplit(Node node, int category_index, String[] category) {
+    public void addCategoricalSplit(Node node, int category_index, Set<String> category) {
         node.setCategoricalRule(category_index, category);
         Node left_node = new Node(false);
         Node right_node = new Node(false);
@@ -225,7 +333,7 @@ public class BinaryTree {
         node_list.add(right_node);
     }
 
-    public void addNumericSplit(Node node, int index, int value) {
+    public void addNumericSplit(Node node, int index, double value) {
         node.setNumericRule(index, value);
         Node left_node = new Node(false);
         Node right_node = new Node(false);
@@ -250,7 +358,7 @@ public class BinaryTree {
         public boolean isCategorical = false;
         public String assignedValue = "";
         public int category_value = 0;
-        public String[] move_left_categorical = {};
+        public Set<String> move_left_categorical = new HashSet<String>();
         public double move_left_less_than = 0;
         public Node left_node;
         public Node right_node;
@@ -265,7 +373,7 @@ public class BinaryTree {
             // Otherwise traverse based on the rule
             if (isCategorical == true) {
                 int index = category_value;
-                String[] leftMove = move_left_categorical;
+                Set<String> leftMove = move_left_categorical;
                 for (String s : leftMove) {
                     if (data.getCategoricalData().get(index).equals(s)) {
                         return left_node.traverse(data);
@@ -288,7 +396,7 @@ public class BinaryTree {
 
         }
 
-        public void setCategoricalRule(int index, String[] categories){
+        public void setCategoricalRule(int index, Set<String> categories){
             isLeaf = false;
             isCategorical = true;
             category_value = index;
@@ -296,7 +404,7 @@ public class BinaryTree {
 
         }
 
-        private void setNumericRule(int index, int value){
+        private void setNumericRule(int index, double value){
             isLeaf = false;
             isCategorical = false;
             category_value = index;

@@ -57,10 +57,10 @@ public class DataSource {
                         data.add(new Datapoint(numerical, categorical, s[classfiedVariable]));
                     } else {
                         creditRows = true;
-                        for (int i: numericalCategoires){
+                        for (int i = 0; i < dataNumericalnames.length; i++){
                             dataNumericalnames[i] = s[numericalCategoires[i]];
                         }
-                        for (int i: categoricalCategories){
+                        for (int i = 0; i < dataCategorialNames.length; i++){
                             dataCategorialNames[i] = s[categoricalCategories[i]];
                         }
 
