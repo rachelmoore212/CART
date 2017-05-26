@@ -274,7 +274,7 @@ public class BinaryTree {
                 return right_node.traverse(data);
 
             } else {//TODO be very sure about less than or equal to
-                if (data.getNumericalData().get(category_value) =< move_left_less_than) {
+                if (data.getNumericalData().get(category_value) <= move_left_less_than) {
                     return left_node.traverse(data);
                 }
                 return right_node.traverse(data);
