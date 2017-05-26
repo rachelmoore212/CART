@@ -13,8 +13,11 @@ public class Main {
 
 
         System.out.println("hello world");
-        DataSource d = new DataSource("/Users/jamie/Documents/College/Senior/DataMining/Final " +
-                "Project/CART/Data/CreditCards/credit-data.csv",numeric_indexes,categorical_indexes);
+        //DataSource d = new DataSource("Data/CreditCards/credit-data.csv",numeric_indexes,categorical_indexes, 24);
+
+        Set<String> attributes = new HashSet<String>(Arrays.asList("meh","penis","vaginenis"));
+        System.out.println(BinaryTree.getSubsets(attributes));
+
     }
 
     /*public double[] getBestCategoricalSplit(List<DataSource.Datapoint> data){
@@ -22,6 +25,7 @@ public class Main {
 
         }
     }*/
+
     public void mapData(List<DataSource.Datapoint> datapoints){
         // Our data
 

@@ -36,11 +36,11 @@ public class DataSource {
             CSVReader reader = new CSVReader(new FileReader("Data/CreditCards/credit-data.csv"));
 
             // Checking the rows of credit data
-            String[] creditRows = {};
+            boolean creditRows = true;
             boolean passedFirst = true;
             if (source.endsWith("credit-data.csv")) {
                 passedFirst = false;
-                creditRows = null;
+                creditRows = false;
             }
             dataCategorialNames = new String[categoricalCategories.length];
             dataNumericalnames = new String[numericalCategoires.length];
@@ -52,7 +52,7 @@ public class DataSource {
             List<String[]> myentries = reader.readAll();
             for (String[] s: myentries){
                 if (passedFirst) {
-                    if (creditRows!=null) {
+                    if (creditRows) {
 
                         // creating a new datapoint for storing the data
                         List<Double> numerical = new ArrayList<>();
@@ -66,7 +66,7 @@ public class DataSource {
 
                         data.add(new Datapoint(numerical, categorical, s[classfiedVariable]));
                     } else {
-                        creditRows = s;
+                        creditRows = true;
                         for (int i: numericalCategoires){
                             dataNumericalnames[i] = s[numericalCategoires[i]];
                         }
@@ -81,7 +81,6 @@ public class DataSource {
                 }
             }
             //System.out.print(data.toString());
-            dataNames = creditRows;
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
