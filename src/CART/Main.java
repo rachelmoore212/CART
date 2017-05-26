@@ -13,8 +13,10 @@ public class Main {
 
 
         System.out.println("hello world");
-        DataSource source = new DataSource("Data/CreditCards/credit-data.csv",numeric_indexes,
-                categorical_indexes, 24);
+        //DataSource d = new DataSource("Data/CreditCards/credit-data.csv",numeric_indexes,categorical_indexes, 24);
+
+        Set<String> attributes = new HashSet<String>(Arrays.asList("meh","penis","vaginenis"));
+        System.out.println(BinaryTree.getSubsets(attributes));
 
         DataSource crossValidation = source.splitDataset(0.2);
 
@@ -29,4 +31,86 @@ public class Main {
         }
     }*/
 
+    public void mapData(List<DataSource.Datapoint> datapoints){
+        // Our data
+
+
+        // Our dictionary that maps index of a category to a dictionary of values in that category
+        // to data that matches it
+        Map<Integer,Map<String,List<DataSource.Datapoint>>> categories_to_points = new Hashtable();
+
+        Map<Integer,Map<String, int[]>> categories_to_classifications = new Hashtable<>();
+
+        // Add each datapoint to the dictionary
+        for (DataSource.Datapoint data: datapoints){
+            List<String> cat_data = data.getCategoricalData();
+            for (int i = 0; i < cat_data.size(); i++){
+
+                // Check if category is a key
+                if(categories_to_points.containsKey(i)){
+
+                    Map<String,List<DataSource.Datapoint>> value_map = categories_to_points.get(i);
+                    String value = cat_data.get(i);
+
+                    // Check if value at category is a key
+                    if(value_map.containsKey(value)) {
+                        List<DataSource.Datapoint> object_list = value_map.get(value);
+                        object_list.add(data);
+                    // add it if its not
+                    } else {
+                        List<DataSource.Datapoint> new_list = new ArrayList<>();
+                        new_list.add(data);
+                        value_map.put(value, new_list);
+                    }
+                 // if category is not a key already, add it
+                } else {
+                    Map<String, List<DataSource.Datapoint>> new_map = new Hashtable<>();
+                    String value = cat_data.get(i);
+                    List<DataSource.Datapoint> new_list = new ArrayList<>();
+                    new_map.put(value, new_list);
+                    categories_to_points.put(i, new_map);
+                }
+
+                // Check if category is a key
+                if(categories_to_classifications.containsKey(i)){
+
+                    Map<String, int[]> classify_map = categories_to_classifications.get(i);
+                    String value = cat_data.get(i);
+
+                    // Check if value at category is a key
+                    if(classify_map.containsKey(value)) {
+                        int[] classify_array = classify_map.get(value);
+                        if (cat_data.getClass().equals("0")) {
+                            classify_array[0]++;
+                        } else {
+                            classify_array[1]++;
+                        }
+
+                    } else {
+                        int [] classify_array = new int [] {0,0};
+                        if (cat_data.getClass().equals("0")) {
+                            classify_array[0]++;
+                        } else {
+                            classify_array[1]++;
+                        }
+                        classify_map.put(value, classify_array);
+                    }
+                    // if category is not a key already, add it
+                } else {
+                    Map<String, int[]> new_map = new Hashtable<>();
+                    String value = cat_data.get(i);
+                    int [] classify_array = new int [] {0,0};
+                    if (cat_data.getClass().equals("0")) {
+                        classify_array[0]++;
+                    } else {
+                        classify_array[1]++;
+                    }
+                    new_map.put(value, classify_array);
+                    categories_to_classifications.put(i, new_map);
+                }
+
+            }
+        }
+
+    }
 }
