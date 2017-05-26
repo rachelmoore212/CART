@@ -23,12 +23,12 @@ public class ClassifierModel {
     private Node recursiveClassify(List<DataSource.Datapoint> nodeAssignments ,int K) {
 
 
-        return newNode()
+        return newNode();
     }
 
 
     // Method that computes the GINI coefictent
-    public double GINI(int success, int fail){
+    public static double GINI(int success, int fail){
         return (1.0*success/(success+fail))*(1.0-(success/(success+fail))) +
                 (1.0*fail/ (success+fail))*(1.0-(fail/(success+fail)));
     }
