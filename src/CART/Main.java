@@ -13,7 +13,8 @@ public class Main {
 
 
         System.out.println("hello world");
-        //DataSource d = new DataSource("Data/CreditCards/credit-data.csv",numeric_indexes,categorical_indexes, 24);
+        DataSource source = new DataSource("Data/CreditCards/credit-data.csv",numeric_indexes,
+                categorical_indexes, 24);
 
         Set<String> attributes = new HashSet<String>(Arrays.asList("meh","penis","vaginenis"));
         System.out.println(BinaryTree.getSubsets(attributes));
