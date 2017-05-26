@@ -49,7 +49,7 @@ public class BinaryTree {
 //        node_list.add(left_node);
 //        node_list.add(right_node);
 //    }
-    public boolean traverse(DataSource.Datapoint data){
+    public String traverse(DataSource.Datapoint data){
 
         Node current = start_node;
 
@@ -80,8 +80,8 @@ public class BinaryTree {
         public boolean isCategorical = false;
         public int category_value = 0;
         public int numeric_value = 0;
-        public int move_left_categorical = 0;
-        public int move_left_less_than = 0;
+        public String[] move_left_categorical = {};
+        public double move_left_less_than = 0;
         public Node left_node;
         public Node right_node;
 
@@ -95,11 +95,11 @@ public class BinaryTree {
 
         }
 
-        public void setCategoricalRule(int index, int category){
+        public void setCategoricalRule(int index, String[] categories){
             isLeaf = false;
             isCategorical = true;
             category_value = index;
-            move_left_categorical = category;
+            move_left_categorical = categories;
 
         }
 

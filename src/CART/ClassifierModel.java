@@ -22,7 +22,17 @@ public class ClassifierModel {
     //Method that runs the node tree thing to do the complmacated mathematitics
     private Node recursiveClassify(List<DataSource.Datapoint> nodeAssignments ,int K) {
 
+
+        return newNode()
     }
+
+
+    // Method that computes the GINI coefictent
+    public double GINI(int success, int fail){
+        return (1.0*success/(success+fail))*(1.0-(success/(success+fail))) +
+                (1.0*fail/ (success+fail))*(1.0-(fail/(success+fail)));
+    }
+
 
 
     //Method that classifies the data after its done

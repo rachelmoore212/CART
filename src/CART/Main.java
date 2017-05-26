@@ -16,7 +16,7 @@ public class Main {
         DataSource source = new DataSource("Data/CreditCards/credit-data.csv",numeric_indexes,
                 categorical_indexes, 24);
 
-        mapData(source.getData());
+        //mapData(source.getData());
     }
 
     /*public double[] getBestCategoricalSplit(List<DataSource.Datapoint> data){
@@ -24,5 +24,5 @@ public class Main {
 
         }
     }*/
-    
+
 }
