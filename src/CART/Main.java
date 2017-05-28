@@ -19,9 +19,12 @@ public class Main {
         Set<String> attributes = new HashSet<String>(Arrays.asList("meh","penis","vaginenis"));
         System.out.println(BinaryTree.getSubsets(attributes));
 
+        //System.out.println(ClassifierModel.GINI(100,0));
+        //System.out.println(ClassifierModel.GINI(90,10));
         DataSource crossValidation = source.splitDataset(0.2);
 
         ClassifierModel model = new ClassifierModel(source, 10);
+        BinaryTree tree = new BinaryTree(source, 1000);
 
         //mapData(source.getData());
     }

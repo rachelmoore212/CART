@@ -1,5 +1,7 @@
 package CART;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -26,7 +28,8 @@ public class BinaryTree {
         min_leaf_size = min_leaf;
 
         Node start_node = new Node(true);
-
+        classifyNode(start_node, dataSource.getData(), num_categories, num_numeric);
+        writeGraph(node_list);
 
     }
 
@@ -37,7 +40,7 @@ public class BinaryTree {
         Map<Integer, Map<String, List<DataSource.Datapoint>>> categories_to_points = map_list[0];
 
         Map<Integer, Map<String, int[]>> categories_to_classifications = map_list[1];
-
+        System.out.println("made new maps");
         //Double[] categorical_ginis = new Double[num_cat];
         //Calculating the total size of the keys in the dataset
         int[] canonvalues = new int[2];
@@ -50,7 +53,7 @@ public class BinaryTree {
         }
 
         // Setting the GINI to its current value
-        double most_min_gini = ClassifierModel.GINI(canonvalues[0],canonvalues[1]);
+        double most_min_gini = 10.0;
         int best_gini_index = -1;
         Set<String> very_best_comb = new HashSet<>();
         double splitValue = 0;
@@ -58,6 +61,7 @@ public class BinaryTree {
         Double[] numeric_ginis = new Double[num_numeric];
 
         for (int i = 0; i < num_cat; i++) {
+            System.out.println("Category");
             //Double[] ginis = new Double[(int)Math.pow(2, categories_to_classifications.get(i).keySet().size())-1];
             double min_gini = 1000;
             Set<String> best_comb = new HashSet<>();
@@ -86,6 +90,7 @@ public class BinaryTree {
                         gini = ClassifierModel.GINI(sum_left_0, sum_left_1) + ClassifierModel.GINI(sum_right_0, sum_right_1);
                     }
                     if (gini < min_gini) {
+                        System.out.println("found good split inner");
                         min_gini = gini;
                         best_comb = comb;
                     }
@@ -93,7 +98,9 @@ public class BinaryTree {
 
             }
             if (min_gini < most_min_gini) {
+                System.out.println("found good split outer");
                 most_min_gini = min_gini;
+                System.out.println(most_min_gini);
                 very_best_comb = best_comb;
                 best_gini_index = i;
             }
@@ -142,12 +149,14 @@ public class BinaryTree {
 
 
         // Here will be code for finding best numeric split
-        if (!(most_min_gini<ClassifierModel.GINI(canonvalues[0],canonvalues[1]))) {
+        //if (!(most_min_gini<ClassifierModel.GINI(canonvalues[0],canonvalues[1]))) {
+        if (most_min_gini > 1) {
             String assignedValue = "1";
             if (canonvalues[0]>canonvalues[1]) {//TODO make this robust for many assignments
                 assignedValue = "0";
             }
             n.setLeaf(assignedValue);
+            System.out.println("made a leaf node");
             return;
         }
 
@@ -182,12 +191,63 @@ public class BinaryTree {
             }
 
         }
-
+        System.out.println("Classify right/left nodes");
         Node left = n.getLeft_node();
         Node right = n.getRight_node();
         classifyNode(left, new_data_left, num_cat, num_numeric);
         classifyNode(right, new_data_right, num_cat, num_numeric);
 
+    }
+
+    public void writeGraph(ArrayList<Node> nodes){
+        FileWriter fileWriter = null;
+        String fileName = "nodes.txt";
+        String COMMA_DELIMITER = " ";
+        int counter = 2;
+        String NEW_LINE_SEPARATOR = "\n";
+        try {
+            fileWriter = new FileWriter(fileName);
+            //Add a new line separator after the header
+            //Write a new student object list to the CSV file
+            for (Node node : nodes) {
+                if (node.isLeaf){
+                    continue;
+                }
+                String node_name = node.getName();
+                Node node_left = node.getLeft_node();
+                Node node_right = node.getRight_node();
+                String node_left_name = node_left.getName();
+                String node_right_name = node_right.getName();
+                if (node_left_name.equals("0") || node_left_name.equals("1")){
+                    node_left_name = node_left_name + "_" + Integer.toString(counter);
+                    counter++;
+                }
+                if (node_right_name.equals("0") || node_right_name.equals("1")){
+                    node_right_name = node_right_name + "_" + Integer.toString(counter);
+                    counter++;
+                }
+                fileWriter.append(node_name);
+                fileWriter.append(COMMA_DELIMITER);
+                fileWriter.append(node_left_name);
+                fileWriter.append(NEW_LINE_SEPARATOR);
+                fileWriter.append(node_name);
+                fileWriter.append(COMMA_DELIMITER);
+                fileWriter.append(node_right_name);
+                fileWriter.append(NEW_LINE_SEPARATOR);
+            }
+            System.out.println("CSV file was created successfully !!!");
+        } catch (Exception e) {
+            System.out.println("Error in CsvFileWriter !!!");
+            e.printStackTrace();
+        } finally {
+            try {
+                fileWriter.flush();
+                fileWriter.close();
+            } catch (IOException e) {
+                System.out.println("Error while flushing/closing fileWriter !!!");
+                e.printStackTrace();
+            }
+        }
     }
 
 //    /**
@@ -309,12 +369,12 @@ public class BinaryTree {
         }
         //System.out.println(categories_to_classifications.toString());
         //System.out.println(Arrays.toString(categories_to_classifications.entrySet().toArray()));
-        for (int i : categories_to_classifications.keySet()) {
+        /*for (int i : categories_to_classifications.keySet()) {
             System.out.println(i + "stuffffffffffffffffffffff");
             for (String s : categories_to_classifications.get(i).keySet()) {
                 System.out.println(s + "     " + categories_to_classifications.get(i).get(s)[1]);
             }
-        }
+        }*/
 
         whyJavaWhy[0] = categories_to_points;
         whyJavaWhy[1] = categories_to_classifications;
@@ -362,6 +422,7 @@ public class BinaryTree {
         public double move_left_less_than = 0;
         public Node left_node;
         public Node right_node;
+        public String node_name = "";
 
 
         public String traverse(DataSource.Datapoint data) {
@@ -394,6 +455,23 @@ public class BinaryTree {
             isStart = start;
             isLeaf = true;
 
+        }
+        public String getName(){
+            String node_name = "";
+            if (isLeaf) {
+                return assignedValue;
+            }
+            if (isCategorical){
+                Set<String> cats = move_left_categorical;
+                node_name = node_name + Integer.toString(category_value) + "_{";
+
+                for (String cat : cats){
+                    node_name = node_name + cat + "_";
+                }
+            } else {
+                node_name = node_name + Integer.toString(category_value) + "_<" + Double.toString(move_left_less_than);
+            }
+            return node_name;
         }
 
         public void setCategoricalRule(int index, Set<String> categories){
