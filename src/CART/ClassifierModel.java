@@ -29,11 +29,13 @@ public class ClassifierModel {
 
     // Method that computes the GINI coefictent
     public static double GINI(int success, int fail) {
-
+        double percent_success = (1.0 * success / (success + fail));
+        double percent_fail = (1.0 * fail / (success + fail));
+        return 1.0 - (percent_fail*percent_fail) - (percent_success*percent_success);
         //System.out.println((1.0 * success / (success + fail)) * (1.0 - (1.0 *success / (success + fail))));
         //System.out.println((1.0 * fail / (success + fail)) * (1.0 - (1.0 * fail / (success + fail))));
-        return (1.0 * success / (success + fail)) * (1.0 - (1.0 *success / (success + fail))) +
-                (1.0 * fail / (success + fail)) * (1.0 - (1.0 *fail / (success + fail)));
+        //return (1.0 * success / (success + fail)) * (1.0 - (1.0 *success / (success + fail))) +
+        //        (1.0 * fail / (success + fail)) * (1.0 - (1.0 *fail / (success + fail)));
     }
 
 

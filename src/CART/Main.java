@@ -21,10 +21,13 @@ public class Main {
 
         //System.out.println(ClassifierModel.GINI(100,0));
         //System.out.println(ClassifierModel.GINI(90,10));
-        DataSource crossValidation = source.splitDataset(0.2);
+        //DataSource crossValidation = source.splitDataset(0.001);
+        DataSource first30pts = source.splitDataset2(30);
+        System.out.println(first30pts.getData().size());
 
-        ClassifierModel model = new ClassifierModel(source, 10);
-        BinaryTree tree = new BinaryTree(source, 1000);
+
+        //ClassifierModel model = new ClassifierModel(crossValidation, 10);
+        BinaryTree tree = new BinaryTree(first30pts, 2);
 
         //mapData(source.getData());
     }

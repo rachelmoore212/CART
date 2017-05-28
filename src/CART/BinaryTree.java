@@ -30,9 +30,20 @@ public class BinaryTree {
         Node start_node = new Node(true);
         classifyNode(start_node, dataSource.getData(), num_categories, num_numeric);
         writeGraph(node_list);
+        graphRecursionPrint(0, start_node);
 
     }
 
+
+    /**
+     * Primary class used in the createion of the binary tree, this method calculates the best
+     * GINI for either a numerical or categorical
+     *
+     * @param n
+     * @param datapoints
+     * @param num_cat
+     * @param num_numeric
+     */
     public void classifyNode(Node n, List<DataSource.Datapoint> datapoints, int num_cat, int
             num_numeric) {
 
@@ -53,7 +64,8 @@ public class BinaryTree {
         }
 
         // Setting the GINI to its current value
-        double most_min_gini = 10.0;
+        double gini_original = ClassifierModel.GINI(canonvalues[0],canonvalues[1]);
+        double most_max_gini = -10.0;
         int best_gini_index = -1;
         Set<String> very_best_comb = new HashSet<>();
         double splitValue = 0;
@@ -61,9 +73,8 @@ public class BinaryTree {
         Double[] numeric_ginis = new Double[num_numeric];
 
         for (int i = 0; i < num_cat; i++) {
-            System.out.println("Category");
             //Double[] ginis = new Double[(int)Math.pow(2, categories_to_classifications.get(i).keySet().size())-1];
-            double min_gini = 1000;
+            double max_gini = 1000;
             Set<String> best_comb = new HashSet<>();
             Map<String, int[]> attribute_map = categories_to_classifications.get(i);
             Set<String> keys = attribute_map.keySet();
@@ -85,22 +96,29 @@ public class BinaryTree {
                     }
                     double gini = 1000;
                     if (((sum_left_0 + sum_left_1) < min_leaf_size )||((sum_right_0 + sum_right_1) < min_leaf_size)){
-                        gini = 1000;
+                        gini = -1000;
+                        System.out.println(sum_left_0 + sum_left_1);
+                        System.out.println(sum_right_0 + sum_right_1);
+                        System.out.println(comb);
                     } else {
-                        gini = ClassifierModel.GINI(sum_left_0, sum_left_1) + ClassifierModel.GINI(sum_right_0, sum_right_1);
+                        //gini = ClassifierModel.GINI(sum_left_0, sum_left_1) + ClassifierModel.GINI(sum_right_0, sum_right_1);
+                        double gini_left = ClassifierModel.GINI(sum_left_0,sum_left_1);
+                        double gini_right = ClassifierModel.GINI(sum_right_0,sum_right_1);
+                        double left_weight = (1.0*(sum_left_0 + sum_left_1)/
+                                (sum_left_0+sum_left_1+sum_right_0+sum_right_1));
+                        gini = gini_original - left_weight*gini_left - (1.0 - left_weight)
+                                *gini_right;
                     }
-                    if (gini < min_gini) {
+                    if (gini > max_gini) {
                         System.out.println("found good split inner");
-                        min_gini = gini;
+                        max_gini = gini;
                         best_comb = comb;
                     }
                 }
 
             }
-            if (min_gini < most_min_gini) {
-                System.out.println("found good split outer");
-                most_min_gini = min_gini;
-                System.out.println(most_min_gini);
+            if (max_gini > most_max_gini) {
+                most_max_gini = max_gini;
                 very_best_comb = best_comb;
                 best_gini_index = i;
             }
@@ -132,11 +150,15 @@ public class BinaryTree {
                 if (value != lastVlaue) {
                     lastVlaue = value;
                     if ((pointer+1>=min_leaf_size)&&(pointer<(datapoints.size()-min_leaf_size))) {
-                        double gini = ClassifierModel.GINI(sum_left_0, sum_left_1) + ClassifierModel
-                                .GINI(sum_right_0, sum_right_1);
+                        double gini_left = ClassifierModel.GINI(sum_left_0,sum_left_1);
+                        double gini_right = ClassifierModel.GINI(sum_right_0,sum_right_1);
+                        double left_weight = (1.0*(sum_left_0 + sum_left_1)/
+                                (sum_left_0+sum_left_1+sum_right_0+sum_right_1));
+                        double gini = gini_original - left_weight*gini_left - (1.0 - left_weight)
+                                *gini_right;
 
-                        if (gini < most_min_gini) {
-                            most_min_gini = gini;
+                        if (gini > most_max_gini) {
+                            most_max_gini = gini;
                             very_best_comb.clear();
                             best_gini_index = i;
                             splitValue = value;
@@ -150,7 +172,7 @@ public class BinaryTree {
 
         // Here will be code for finding best numeric split
         //if (!(most_min_gini<ClassifierModel.GINI(canonvalues[0],canonvalues[1]))) {
-        if (most_min_gini > 1) {
+        if (most_max_gini < 0) {
             String assignedValue = "1";
             if (canonvalues[0]>canonvalues[1]) {//TODO make this robust for many assignments
                 assignedValue = "0";
@@ -160,9 +182,11 @@ public class BinaryTree {
             return;
         }
 
+
+        // Determining what the new split for the data will be based on the rule
         List<DataSource.Datapoint> new_data_left;
         List<DataSource.Datapoint> new_data_right;
-
+        // Calculations for numeric data
         if (very_best_comb.isEmpty()) {
             addNumericSplit(n, best_gini_index, splitValue);
             //get list of data
@@ -175,6 +199,8 @@ public class BinaryTree {
                     new_data_right.add(data);
                 }
             }
+
+        // Calculations for categorical data
         } else {
             addCategoricalSplit(n, best_gini_index, very_best_comb);
             new_data_left = new ArrayList<>();
@@ -192,12 +218,33 @@ public class BinaryTree {
 
         }
         System.out.println("Classify right/left nodes");
+        System.out.println("Right side has "+new_data_right.size()+" things");
+        System.out.println("Left side has "+new_data_left.size()+" things");
+        System.out.println("The categorical rule is: " + very_best_comb);
+        System.out.println("Numerical rule problem value is: "+splitValue);
+        System.out.println("Numerical rule problem name is: "+DataSource.getDataNumericalnames()
+                [best_gini_index]);
+        System.out.println("Most Min GINIS was: "+most_max_gini);
         Node left = n.getLeft_node();
         Node right = n.getRight_node();
         classifyNode(left, new_data_left, num_cat, num_numeric);
         classifyNode(right, new_data_right, num_cat, num_numeric);
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public void writeGraph(ArrayList<Node> nodes){
         FileWriter fileWriter = null;
@@ -249,6 +296,20 @@ public class BinaryTree {
             }
         }
     }
+
+    private void graphRecursionPrint(int depth, Node curnode) {
+        String output = "";
+        for (int i = depth; i > 0; i--) {
+            output = output + " | ";
+        }
+        System.out.println(output + curnode.getName());
+
+        if (!curnode.isLeaf){
+            graphRecursionPrint(depth + 1, curnode.getLeft_node());
+            graphRecursionPrint(depth + 1, curnode.getRight_node());
+        }
+    }
+
 
 //    /**
 //     * Method that pefroms the voting of datapoints in the classifcation
@@ -411,6 +472,12 @@ public class BinaryTree {
         //prune shit
     }
 
+
+    /**
+     * Node class
+     *
+     * Used to store information in the binary tree for later traversal.
+     */
     private class Node {
 
         public boolean isStart = false;

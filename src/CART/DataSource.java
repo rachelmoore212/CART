@@ -106,6 +106,16 @@ public class DataSource {
         else return null;
     }
 
+    //
+    public DataSource splitDataset2(int number) {
+
+        List<Datapoint> newData = data.subList(0, number);
+
+        DataSource output = new DataSource(newData, dataCategorialNames, dataNumericalnames);
+        return output;
+
+    }
+
     //public List<Datapoint> getPoints(int [] indexes){
 
         //return data.get(indexes);
