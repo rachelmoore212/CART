@@ -22,18 +22,20 @@ public class Main {
         //System.out.println(ClassifierModel.GINI(100,0));
         //System.out.println(ClassifierModel.GINI(90,10));
 
+        DataSource accuracyEvaluation = source.splitDataset(0.2);
         DataSource crossValidation = source.splitDataset(0.2);
         //DataSource first30pts = source.splitDataset2(30);
         //System.out.println(first30pts.getData().size());
 
 
         //ClassifierModel model = new ClassifierModel(crossValidation, 10);
-        BinaryTree tree = new BinaryTree(source, 10);
+        BinaryTree tree = new BinaryTree(source, 30);
 
-        System.out.println(ClassifierModel.checkAccuracy(tree,crossValidation));
+        System.out.println(ClassifierModel.checkAccuracy(tree,accuracyEvaluation));
+        tree.crossValidate(crossValidation);
         double z = 1.95;
         tree.pruneTree(z);
-        System.out.println(ClassifierModel.checkAccuracy(tree,crossValidation));
+        System.out.println(ClassifierModel.checkAccuracy(tree,accuracyEvaluation));
         //System.out.println(tree.start_node.isLeaf);
         //System.out.println(tree.start_node.getLeft_node());
 
