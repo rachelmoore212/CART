@@ -16,8 +16,8 @@ import java.util.List;
 public class DataSource {
 
     private List<Datapoint> data = new ArrayList<>();
-    private String[] dataCategorialNames;
-    private String[] dataNumericalnames;
+    private static String[] dataCategorialNames;
+    private static String[] dataNumericalnames;
 
 
     public DataSource(String source, int[] numericalCategoires, int[] categoricalCategories, int
@@ -141,11 +141,11 @@ public class DataSource {
             return output;
         }
     }
-    public String[] getDataNumericalnames() {
+    public static String[] getDataNumericalnames() {
         return dataNumericalnames;
     }
 
-    public String[] getDataCategorialNames() {
+    public static String[] getDataCategorialNames() {
         return dataCategorialNames;
     }
 

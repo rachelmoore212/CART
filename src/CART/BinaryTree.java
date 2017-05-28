@@ -461,15 +461,17 @@ public class BinaryTree {
             if (isLeaf) {
                 return assignedValue;
             }
-            if (isCategorical){
+            if (isCategorical) {
                 Set<String> cats = move_left_categorical;
-                node_name = node_name + Integer.toString(category_value) + "_{";
+                node_name = node_name + DataSource.getDataCategorialNames()[category_value] + "_{";
 
-                for (String cat : cats){
+                for (String cat : cats) {
                     node_name = node_name + cat + "_";
                 }
+                node_name = node_name + "}";
             } else {
-                node_name = node_name + Integer.toString(category_value) + "_<" + Double.toString(move_left_less_than);
+                node_name = node_name + DataSource.getDataNumericalnames()[category_value] + "_<"
+                        + Double.toString(move_left_less_than);
             }
             return node_name;
         }
