@@ -63,4 +63,17 @@ public class ClassifierModel {
         return "FOOOOOOOOOOOOO";
     }
 
+    public static double pessemisticError(int wrong, int total, double z){
+        //System.out.println("wrong: "+wrong+"  total:"+total+"   z:"+z);
+        double p = 1.0*wrong/total;
+        if (p == 0.0){
+           return 0.0;
+
+        }
+        double top_error_rate = p + z * Math.sqrt(1.0*(p*(1-p))/total);
+        double error = 1.0*total*top_error_rate;
+        //System.out.println("Error: " + error);
+        return error;
+    }
+
 }

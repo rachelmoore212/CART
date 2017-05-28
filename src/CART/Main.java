@@ -28,8 +28,11 @@ public class Main {
 
 
         //ClassifierModel model = new ClassifierModel(crossValidation, 10);
-        BinaryTree tree = new BinaryTree(source, 50);
+        BinaryTree tree = new BinaryTree(source, 10);
 
+        System.out.println(ClassifierModel.checkAccuracy(tree,crossValidation));
+        double z = 1.95;
+        tree.pruneTree(z);
         System.out.println(ClassifierModel.checkAccuracy(tree,crossValidation));
         //System.out.println(tree.start_node.isLeaf);
         //System.out.println(tree.start_node.getLeft_node());

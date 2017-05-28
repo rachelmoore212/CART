@@ -30,8 +30,73 @@ public class BinaryTree {
         start_node = new Node(true);
         classifyNode(start_node, dataSource.getData(), num_categories, num_numeric);
         writeGraph(node_list);
-        graphRecursionPrint(0, start_node);
+        //System.out.println(ClassifierModel.checkAccuracy(self,crossValidation));
+        //graphRecursionPrint(0, start_node);
+        double z = 1.15;
+        //pruneTree(z);
+        //writeGraph(node_list);
+        //graphRecursionPrint(0, start_node);
 
+    }
+
+    public void pruneTree(double z){
+        int init_length = node_list.size();
+        boolean still_pruning = true;
+        while (still_pruning){
+            still_pruning = false;
+            for (Node node :node_list){
+                Node node_left = node.getLeft_node();
+                Node node_right = node.getRight_node();
+                if (!node.isLeaf) {
+                    if ((node_left.isLeaf) && (node_right.isLeaf)) {
+                        if (node_left.assignedValue == node_right.assignedValue){
+                            //System.out.println("remove branch that goes to same value");
+                            still_pruning = true;
+                            int new_0 = node_left.num_data_0 + node_right.num_data_1;
+                            int new_1 = node_left.num_data_1 + node_right.num_data_1;
+                            String classify;
+                            if (new_0 > new_1){
+                                classify = "0";
+
+                            } else {
+                                classify = "1";
+                            }
+                            node.setLeaf(classify, new_0, new_1);
+                            continue;
+                        }
+
+                        double left_error = ClassifierModel.
+                                pessemisticError(Math.min(node_left.num_data_0, node_left.num_data_1),
+                                        (node_left.num_data_0 + node_left.num_data_1), z);
+                        double right_error = ClassifierModel.
+                                pessemisticError(Math.min(node_right.num_data_0, node_right.num_data_1),
+                                        (node_right.num_data_0 + node_right.num_data_1), z);
+                        double total_error = ClassifierModel.
+                                pessemisticError(Math.min(node_left.num_data_0 + node_right.num_data_0,
+                                        node_left.num_data_1 + node_right.num_data_1),
+                                        (node_left.num_data_0 + node_left.num_data_1 + node_right.num_data_0 +
+                                        node_right.num_data_1), z);
+                        if (total_error < (left_error + right_error)) {
+                            System.out.println("is pruning");
+                            still_pruning = true;
+                            int new_0 = node_left.num_data_0 + node_right.num_data_1;
+                            int new_1 = node_left.num_data_1 + node_right.num_data_1;
+                            String classify;
+                            if (new_0 > new_1){
+                                classify = "0";
+
+                            } else {
+                                classify = "1";
+                            }
+                            node.setLeaf(classify, new_0, new_1);
+                        }
+                    }
+                }
+            }
+
+        }
+        System.out.println(init_length);
+        System.out.println(node_list.size());
     }
 
 
@@ -176,7 +241,7 @@ public class BinaryTree {
             if (canonvalues[0]>canonvalues[1]) {//TODO make this robust for many assignments
                 assignedValue = "0";
             }
-            n.setLeaf(assignedValue);
+            n.setLeaf(assignedValue, canonvalues[0],canonvalues[1]);
             System.out.println("made a leaf node");
             return;
         }
@@ -494,6 +559,8 @@ public class BinaryTree {
         public Node left_node;
         public Node right_node;
         public String node_name = "";
+        public int num_data_0 = 0;
+        public int num_data_1 = 0;
 
 
         public String traverse(DataSource.Datapoint data) {
@@ -573,9 +640,11 @@ public class BinaryTree {
             return isLeaf;
         }
 
-        public void setLeaf(String assignedValue) {
+        public void setLeaf(String assignedValue, int num_0, int num_1) {
             isLeaf = true;
             this.assignedValue = assignedValue;
+            this.num_data_0 = num_0;
+            this.num_data_1 = num_1;
         }
 
         public boolean isCategorical() {
