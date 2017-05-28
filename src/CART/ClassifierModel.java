@@ -26,6 +26,25 @@ public class ClassifierModel {
         return newNode();
     }*/
 
+    /**
+     * Method that evaluates the overall accuracy of a model on some test dataset
+     */
+    public static double checkAccuracy(BinaryTree tree, DataSource testData) {
+        int numCorrect = 0;
+        int numIncorrect = 0;
+
+        for (DataSource.Datapoint d : testData.getData()) {
+
+            String assignment = tree.findAssignment(d);
+            if (assignment.equals(d.classification)) {
+                numCorrect++;
+            } else {
+                numIncorrect++;
+            }
+        }
+        return (1.0*numCorrect)/(numCorrect + numIncorrect);
+    }
+
 
     // Method that computes the GINI coefictent
     public static double GINI(int success, int fail) {
@@ -43,7 +62,5 @@ public class ClassifierModel {
     public String ClassifyDatapoint(DataSource.Datapoint point) {
         return "FOOOOOOOOOOOOO";
     }
-
-
 
 }

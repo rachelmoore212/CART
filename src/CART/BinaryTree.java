@@ -15,7 +15,7 @@ public class BinaryTree {
 
     public ArrayList<Node> node_list = new ArrayList<Node>();
 
-    public Node start_node = new Node(true);
+    public Node start_node;
 
     public ArrayList<String> categories = new ArrayList<String>();
 
@@ -27,7 +27,7 @@ public class BinaryTree {
         int num_numeric = dataSource.getDataNumericalnames().length;
         min_leaf_size = min_leaf;
 
-        Node start_node = new Node(true);
+        start_node = new Node(true);
         classifyNode(start_node, dataSource.getData(), num_categories, num_numeric);
         writeGraph(node_list);
         graphRecursionPrint(0, start_node);
@@ -48,7 +48,7 @@ public class BinaryTree {
             num_numeric) {
 
         Map[] map_list = mapData(datapoints);
-        Map<Integer, Map<String, List<DataSource.Datapoint>>> categories_to_points = map_list[0];
+        //Map<Integer, Map<String, List<DataSource.Datapoint>>> categories_to_points = map_list[0];
 
         Map<Integer, Map<String, int[]>> categories_to_classifications = map_list[1];
         System.out.println("made new maps");
@@ -74,7 +74,7 @@ public class BinaryTree {
 
         for (int i = 0; i < num_cat; i++) {
             //Double[] ginis = new Double[(int)Math.pow(2, categories_to_classifications.get(i).keySet().size())-1];
-            double max_gini = 1000;
+            double max_gini = -1000;
             Set<String> best_comb = new HashSet<>();
             Map<String, int[]> attribute_map = categories_to_classifications.get(i);
             Set<String> keys = attribute_map.keySet();
@@ -97,9 +97,6 @@ public class BinaryTree {
                     double gini = 1000;
                     if (((sum_left_0 + sum_left_1) < min_leaf_size )||((sum_right_0 + sum_right_1) < min_leaf_size)){
                         gini = -1000;
-                        System.out.println(sum_left_0 + sum_left_1);
-                        System.out.println(sum_right_0 + sum_right_1);
-                        System.out.println(comb);
                     } else {
                         //gini = ClassifierModel.GINI(sum_left_0, sum_left_1) + ClassifierModel.GINI(sum_right_0, sum_right_1);
                         double gini_left = ClassifierModel.GINI(sum_left_0,sum_left_1);
@@ -110,7 +107,6 @@ public class BinaryTree {
                                 *gini_right;
                     }
                     if (gini > max_gini) {
-                        System.out.println("found good split inner");
                         max_gini = gini;
                         best_comb = comb;
                     }
@@ -146,22 +142,25 @@ public class BinaryTree {
                     sum_left_1++;
                     sum_right_1--;
                 }
-                double value = datapoints.get(pointer).getNumericalData().get(i);
-                if (value != lastVlaue) {
-                    lastVlaue = value;
-                    if ((pointer+1>=min_leaf_size)&&(pointer<(datapoints.size()-min_leaf_size))) {
-                        double gini_left = ClassifierModel.GINI(sum_left_0,sum_left_1);
-                        double gini_right = ClassifierModel.GINI(sum_right_0,sum_right_1);
-                        double left_weight = (1.0*(sum_left_0 + sum_left_1)/
-                                (sum_left_0+sum_left_1+sum_right_0+sum_right_1));
-                        double gini = gini_original - left_weight*gini_left - (1.0 - left_weight)
-                                *gini_right;
+                if ((pointer+1>=min_leaf_size)&&(pointer<(datapoints.size()-min_leaf_size))) {
+                    double value = datapoints.get(pointer).getNumericalData().get(i);
+                    double nextValue = datapoints.get(pointer+1).getNumericalData().get(i);
+
+                    if (nextValue!= value) {
+                        double gini_left = ClassifierModel.GINI(sum_left_0, sum_left_1);
+                        double gini_right = ClassifierModel.GINI(sum_right_0, sum_right_1);
+                        double left_weight = (1.0 * (sum_left_0 + sum_left_1) /
+                                (sum_left_0 + sum_left_1 + sum_right_0 + sum_right_1));
+                        double gini = gini_original - left_weight * gini_left - (1.0 - left_weight)
+                                * gini_right;
+                        //System.out.println("value is: " + value);
 
                         if (gini > most_max_gini) {
                             most_max_gini = gini;
                             very_best_comb.clear();
                             best_gini_index = i;
                             splitValue = value;
+                            //System.out.println("pointer was: " + pointer);
                         }
                     }
                 }
@@ -205,25 +204,27 @@ public class BinaryTree {
             addCategoricalSplit(n, best_gini_index, very_best_comb);
             new_data_left = new ArrayList<>();
             new_data_right = new ArrayList<>();
-            Map<String, List<DataSource.Datapoint>> mapped_points = categories_to_points.get
-                    (best_gini_index);
-            for (String key : mapped_points.keySet()) {
-                if (very_best_comb.contains(key)) {
-                    new_data_left.addAll(mapped_points.get(key));
+            for (DataSource.Datapoint data : datapoints) {
+                if (very_best_comb.contains(data.getCategoricalData().get(best_gini_index))) {
+                    new_data_left.add(data);
                 } else {
-                    new_data_right.addAll(mapped_points.get(key));
+                    new_data_right.add(data);
                 }
-
             }
-
         }
         System.out.println("Classify right/left nodes");
         System.out.println("Right side has "+new_data_right.size()+" things");
         System.out.println("Left side has "+new_data_left.size()+" things");
-        System.out.println("The categorical rule is: " + very_best_comb);
-        System.out.println("Numerical rule problem value is: "+splitValue);
-        System.out.println("Numerical rule problem name is: "+DataSource.getDataNumericalnames()
-                [best_gini_index]);
+        if (very_best_comb.isEmpty()) {
+            System.out.println("Numerical rule problem value is: "+splitValue);
+            System.out.println("Numerical rule problem name is: "+DataSource.getDataNumericalnames()
+                    [best_gini_index]);
+        } else {
+            System.out.println("The category split was: " + DataSource.getDataCategorialNames()[best_gini_index]);
+            System.out.println("The categorical rule is: " + very_best_comb);
+        }
+
+
         System.out.println("Most Min GINIS was: "+most_max_gini);
         Node left = n.getLeft_node();
         Node right = n.getRight_node();
@@ -260,11 +261,11 @@ public class BinaryTree {
                 if (node.isLeaf){
                     continue;
                 }
-                String node_name = node.getName();
+                String node_name = node.toString();
                 Node node_left = node.getLeft_node();
                 Node node_right = node.getRight_node();
-                String node_left_name = node_left.getName();
-                String node_right_name = node_right.getName();
+                String node_left_name = node_left.toString();
+                String node_right_name = node_right.toString();
                 if (node_left_name.equals("0") || node_left_name.equals("1")){
                     node_left_name = node_left_name + "_" + Integer.toString(counter);
                     counter++;
@@ -302,7 +303,7 @@ public class BinaryTree {
         for (int i = depth; i > 0; i--) {
             output = output + " | ";
         }
-        System.out.println(output + curnode.getName());
+        System.out.println(output + curnode.toString());
 
         if (!curnode.isLeaf){
             graphRecursionPrint(depth + 1, curnode.getLeft_node());
@@ -347,6 +348,7 @@ public class BinaryTree {
         }
         return output;
     }
+
 
     static public Map[] mapData(List<DataSource.Datapoint> datapoints) {
         // Our data
@@ -430,12 +432,14 @@ public class BinaryTree {
         }
         //System.out.println(categories_to_classifications.toString());
         //System.out.println(Arrays.toString(categories_to_classifications.entrySet().toArray()));
-        /*for (int i : categories_to_classifications.keySet()) {
-            System.out.println(i + "stuffffffffffffffffffffff");
-            for (String s : categories_to_classifications.get(i).keySet()) {
-                System.out.println(s + "     " + categories_to_classifications.get(i).get(s)[1]);
-            }
-        }*/
+//        for (int i : categories_to_classifications.keySet()) {
+//            System.out.println(DataSource.getDataCategorialNames()[i] +
+//                    " Category");
+//            for (String s : categories_to_classifications.get(i).keySet()) {
+//                System.out.println(s + "     [" +categories_to_classifications.get(i).get(s)[0]+
+//                        " , " + categories_to_classifications.get(i).get(s)[1] + "]");
+//            }
+//        }
 
         whyJavaWhy[0] = categories_to_points;
         whyJavaWhy[1] = categories_to_classifications;
@@ -478,12 +482,12 @@ public class BinaryTree {
      *
      * Used to store information in the binary tree for later traversal.
      */
-    private class Node {
+    public class Node {
 
         public boolean isStart = false;
-        public boolean isLeaf = true;
+        public boolean isLeaf;
         public boolean isCategorical = false;
-        public String assignedValue = "";
+        public String assignedValue = "FOOO";
         public int category_value = 0;
         public Set<String> move_left_categorical = new HashSet<String>();
         public double move_left_less_than = 0;
@@ -502,12 +506,11 @@ public class BinaryTree {
             if (isCategorical == true) {
                 int index = category_value;
                 Set<String> leftMove = move_left_categorical;
-                for (String s : leftMove) {
-                    if (data.getCategoricalData().get(index).equals(s)) {
-                        return left_node.traverse(data);
-                    }
+                if (leftMove.contains(data.getCategoricalData().get(index))) {
+                    return left_node.traverse(data);
+                } else {
+                    return right_node.traverse(data);
                 }
-                return right_node.traverse(data);
 
             } else {//TODO be very sure about less than or equal to
                 if (data.getNumericalData().get(category_value) <= move_left_less_than) {
@@ -520,11 +523,12 @@ public class BinaryTree {
         public Node(boolean start){
 
             isStart = start;
-            isLeaf = true;
+            isLeaf = false;
 
         }
-        public String getName(){
-            String node_name = "";
+
+        @Override
+        public String toString(){
             if (isLeaf) {
                 return assignedValue;
             }
