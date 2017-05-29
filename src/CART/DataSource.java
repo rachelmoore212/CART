@@ -5,10 +5,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by jamie on 5/21/17.
@@ -35,7 +32,7 @@ public class DataSource {
             if (source.endsWith("agaricus-lepiota.data")) {
                 creditRows = false;
             }
-            if (source.endsWith("adults.data")) {
+            if (source.endsWith("adult.data")) {
                 creditRows = false;
             }
 
@@ -51,17 +48,23 @@ public class DataSource {
                 if (passedFirst) {
                     if (creditRows) {
 
-                        // creating a new datapoint for storing the data
-                        List<Double> numerical = new ArrayList<>();
-                        List<String> categorical = new ArrayList<>();
-                        for (int i: numericalCategoires){
-                            numerical.add(Double.parseDouble(s[i]));
-                        }
-                        for (int i: categoricalCategories){
-                            categorical.add(s[i]);
-                        }
+                        System.out.println(s);
+                        //Ignoring missing data
+                        if (!Arrays.asList(s).contains("")) {
 
-                        data.add(new Datapoint(numerical, categorical, s[classfiedVariable]));
+
+                            // creating a new datapoint for storing the data
+                            List<Double> numerical = new ArrayList<>();
+                            List<String> categorical = new ArrayList<>();
+                            for (int i : numericalCategoires) {
+                                numerical.add(Double.parseDouble(s[i]));
+                            }
+                            for (int i : categoricalCategories) {
+                                categorical.add(s[i]);
+                            }
+
+                            data.add(new Datapoint(numerical, categorical, s[classfiedVariable]));
+                        }
                     } else {
                         creditRows = true;
                         for (int i = 0; i < dataNumericalnames.length; i++){

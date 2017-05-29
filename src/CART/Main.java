@@ -25,12 +25,12 @@ public class Main {
     static String datasource = "Data/Mushroom/agaricus-lepiota.data";
     */
 
-    static int [] categorical_indexes = new int [] {1,3,5,6,7,8,9,10,14};
+    static int [] categorical_indexes = new int [] {1,3,5,6,7,8,9,13};
 
-    static int [] numeric_indexes = new int [] {0,2,4,11,12,13};
+    static int [] numeric_indexes = new int [] {0,2,4,10,11,12};
 
     static String[] targetValue = new String[]{"<=50K",">=50K"};
-    static int classifyIndex = 15;
+    static int classifyIndex = 14;
     static String datasource = "Data/Money/adult.data";
 
 
@@ -58,7 +58,7 @@ public class Main {
 //        RandomForestModel model = new RandomForestModel(source,0.8,100,50,1.95);
 //        System.out.println(model.checkAccuracy(accuracyEvaluation));
 
-        BinaryTree tree = new BinaryTree(source, 10);
+        BinaryTree tree = new BinaryTree(source, 100);
         BinaryTree tree1 = ClassifierModel.crossValidate(tree, crossValidation);
         //tree.pruneTree(1.95);
         tree.graphRecursionPrint(0,tree.start_node);
