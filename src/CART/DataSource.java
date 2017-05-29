@@ -35,6 +35,9 @@ public class DataSource {
             if (source.endsWith("agaricus-lepiota.data")) {
                 creditRows = false;
             }
+            if (source.endsWith("adults.data")) {
+                creditRows = false;
+            }
 
             dataCategorialNames = new String[categoricalCategories.length];
             dataNumericalnames = new String[numericalCategoires.length];
