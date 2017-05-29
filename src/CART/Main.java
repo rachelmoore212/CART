@@ -12,34 +12,46 @@ public class Main {
     public static void main(String[] args){
 
 
-        System.out.println("hello world");
+        //System.out.println("hello world");
         DataSource source = new DataSource("Data/CreditCards/credit-data.csv",numeric_indexes,
                 categorical_indexes, 24);
 
-        Set<String> attributes = new HashSet<String>(Arrays.asList("meh","penis","vaginenis"));
-        System.out.println(BinaryTree.getSubsets(attributes));
+        //Set<String> attributes = new HashSet<String>(Arrays.asList("meh","penis","vaginenis"));
+        //System.out.println(BinaryTree.getSubsets(attributes));
 
         //System.out.println(ClassifierModel.GINI(100,0));
         //System.out.println(ClassifierModel.GINI(90,10));
 
         DataSource accuracyEvaluation = source.splitDataset(0.2);
-        DataSource crossValidation = source.splitDataset(0.2);
+        //DataSource crossValidation = source.splitDataset(0.3);
         //DataSource first30pts = source.splitDataset2(30);
         //System.out.println(first30pts.getData().size());
 
 
+        int [] min_leafs = new int [] {1, 5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90,100};
+        String results = "[";
+        for (int i : min_leafs){
+            System.out.println(i);
+            BinaryTree tree = new BinaryTree(source, i);
+            tree.pruneTree(1);
+            results = results + Double.toString(ClassifierModel.checkAccuracy(tree,accuracyEvaluation)) + ", ";
+        }
+        System.out.println(results);
+        /*
         //ClassifierModel model = new ClassifierModel(crossValidation, 10);
-        BinaryTree tree = new BinaryTree(source, 30);
+        BinaryTree tree = new BinaryTree(source, 20);
 
         System.out.println(ClassifierModel.checkAccuracy(tree,accuracyEvaluation));
-        tree.crossValidate(crossValidation);
+        //tree.crossValidate(crossValidation);
         double z = 1.95;
         tree.pruneTree(z);
         System.out.println(ClassifierModel.checkAccuracy(tree,accuracyEvaluation));
+        BinaryTree new_tree = ClassifierModel.crossValidate(tree, crossValidation);
+        System.out.println(ClassifierModel.checkAccuracy(new_tree, accuracyEvaluation));
         //System.out.println(tree.start_node.isLeaf);
         //System.out.println(tree.start_node.getLeft_node());
 
-
+        */
         //mapData(source.getData());
     }
 
