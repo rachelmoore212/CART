@@ -87,7 +87,7 @@ public class DataSource {
 
     //Method that partitions the array into smaller chunks probablilistially for the purposes of
     // training
-    public DataSource splitDataset(double factor) {
+    public DataSource splitDataset(double factor, boolean replacement) {
         if ((factor > 0)&& (factor < 1)) {
             if (factor<(1.0/data.size())) {
                 factor = 1.0/data.size();
@@ -98,7 +98,9 @@ public class DataSource {
             Collections.shuffle(data);
 
             List<Datapoint> newData = data.subList(0, (int)(data.size()*1.0* factor));
-            data = data.subList((int)(data.size()*1.0* factor), data.size());
+            if (!replacement) {
+                data = data.subList((int)(data.size()*1.0* factor), data.size());
+            }
 
             DataSource output = new DataSource(newData, dataCategorialNames, dataNumericalnames);
             return output;

@@ -22,8 +22,8 @@ public class Main {
         //System.out.println(ClassifierModel.GINI(100,0));
         //System.out.println(ClassifierModel.GINI(90,10));
 
-        DataSource accuracyEvaluation = source.splitDataset(0.2);
-        DataSource crossValidation = source.splitDataset(0.2);
+        DataSource accuracyEvaluation = source.splitDataset(0.2, false);
+        DataSource crossValidation = source.splitDataset(0.2, false);
         //DataSource first30pts = source.splitDataset2(30);
         //System.out.println(first30pts.getData().size());
 
@@ -32,7 +32,6 @@ public class Main {
         BinaryTree tree = new BinaryTree(source, 30);
 
         System.out.println(ClassifierModel.checkAccuracy(tree,accuracyEvaluation));
-        tree.crossValidate(crossValidation);
         double z = 1.95;
         tree.pruneTree(z);
         System.out.println(ClassifierModel.checkAccuracy(tree,accuracyEvaluation));
