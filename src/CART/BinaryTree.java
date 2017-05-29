@@ -39,6 +39,8 @@ public class BinaryTree {
 
     }
 
+
+
     public void pruneTree(double z){
         int init_length = node_list.size();
         boolean still_pruning = true;
@@ -56,15 +58,15 @@ public class BinaryTree {
                             int new_1 = node_left.num_data_1 + node_right.num_data_1;
                             String classify;
                             if (new_0 > new_1){
-                                classify = "0";
+                                classify = Main.targetValue[0];
 
                             } else {
-                                classify = "1";
+                                classify = Main.targetValue[1];
                             }
                             node.setLeaf(classify, new_0, new_1);
                             continue;
                         }
-
+                        /*
                         double left_error = ClassifierModel.
                                 pessemisticError(Math.min(node_left.num_data_0, node_left.num_data_1),
                                         (node_left.num_data_0 + node_left.num_data_1), z);
@@ -83,20 +85,20 @@ public class BinaryTree {
                             int new_1 = node_left.num_data_1 + node_right.num_data_1;
                             String classify;
                             if (new_0 > new_1){
-                                classify = "0";
+                                classify = Main.targetValue[0];
 
                             } else {
-                                classify = "1";
+                                classify = Main.targetValue[1];
                             }
                             node.setLeaf(classify, new_0, new_1);
-                        }
+                        }*/
                     }
                 }
             }
 
         }
-        System.out.println(init_length);
-        System.out.println(node_list.size());
+       // System.out.println(init_length);
+        //System.out.println(node_list.size());
     }
 
 
@@ -116,7 +118,7 @@ public class BinaryTree {
         //Map<Integer, Map<String, List<DataSource.Datapoint>>> categories_to_points = map_list[0];
 
         Map<Integer, Map<String, int[]>> categories_to_classifications = map_list[1];
-        System.out.println("made new maps");
+        //System.out.println("made new maps");
         //Double[] categorical_ginis = new Double[num_cat];
         //Calculating the total size of the keys in the dataset
         int[] canonvalues = new int[2];
@@ -200,7 +202,7 @@ public class BinaryTree {
 
             double lastVlaue = -1212341.1234123;//TODO bullshit
             for(int pointer = 0; pointer < datapoints.size(); pointer++) {
-                if (datapoints.get(pointer).getClassification().equals("0")) {
+                if (datapoints.get(pointer).getClassification().equals(Main.targetValue[0])) {
                     sum_left_0++;
                     sum_right_0--;
                 } else {
@@ -237,12 +239,12 @@ public class BinaryTree {
         // Here will be code for finding best numeric split
         //if (!(most_min_gini<ClassifierModel.GINI(canonvalues[0],canonvalues[1]))) {
         if (most_max_gini < 0) {
-            String assignedValue = "1";
+            String assignedValue = Main.targetValue[1];
             if (canonvalues[0]>canonvalues[1]) {//TODO make this robust for many assignments
-                assignedValue = "0";
+                assignedValue = Main.targetValue[0];
             }
             n.setLeaf(assignedValue, canonvalues[0],canonvalues[1]);
-            System.out.println("made a leaf node");
+           // System.out.println("made a leaf node");
             return;
         }
 
@@ -250,15 +252,24 @@ public class BinaryTree {
         // Determining what the new split for the data will be based on the rule
         List<DataSource.Datapoint> new_data_left;
         List<DataSource.Datapoint> new_data_right;
+        int num_0 = 0;
+        int num_1 = 0;
         // Calculations for numeric data
         if (very_best_comb.isEmpty()) {
             addNumericSplit(n, best_gini_index, splitValue);
             //get list of data
             new_data_left = new ArrayList<>();
             new_data_right = new ArrayList<>();
+
             for (DataSource.Datapoint data : datapoints) {
+                if (data.getClassification()==Main.targetValue[0]){
+                    num_0++;
+                } else {
+                    num_1++;
+                }
                 if (data.getNumericalData().get(best_gini_index) <= splitValue) {
                     new_data_left.add(data);
+
                 } else {
                     new_data_right.add(data);
                 }
@@ -270,6 +281,12 @@ public class BinaryTree {
             new_data_left = new ArrayList<>();
             new_data_right = new ArrayList<>();
             for (DataSource.Datapoint data : datapoints) {
+                if (data.getClassification()==Main.targetValue[0]){
+                    num_0++;
+
+                } else {
+                    num_1++;
+                }
                 if (very_best_comb.contains(data.getCategoricalData().get(best_gini_index))) {
                     new_data_left.add(data);
                 } else {
@@ -277,20 +294,20 @@ public class BinaryTree {
                 }
             }
         }
-        System.out.println("Classify right/left nodes");
-        System.out.println("Right side has "+new_data_right.size()+" things");
-        System.out.println("Left side has "+new_data_left.size()+" things");
+        n.setNumData(num_0, num_1);
+        //System.out.println("Classify right/left nodes");
+        //System.out.println("Right side has "+new_data_right.size()+" things");
+        //System.out.println("Left side has "+new_data_left.size()+" things");
         if (very_best_comb.isEmpty()) {
-            System.out.println("Numerical rule problem value is: "+splitValue);
-            System.out.println("Numerical rule problem name is: "+DataSource.getDataNumericalnames()
-                    [best_gini_index]);
+            //System.out.println("Numerical rule problem value is: "+splitValue);
+            //System.out.println("Numerical rule problem name is: "+DataSource.getDataNumericalnames()[best_gini_index]);
         } else {
-            System.out.println("The category split was: " + DataSource.getDataCategorialNames()[best_gini_index]);
-            System.out.println("The categorical rule is: " + very_best_comb);
+            //System.out.println("The category split was: " + DataSource.getDataCategorialNames()[best_gini_index]);
+            //System.out.println("The categorical rule is: " + very_best_comb);
         }
 
 
-        System.out.println("Most Min GINIS was: "+most_max_gini);
+        //System.out.println("Most Min GINIS was: "+most_max_gini);
         Node left = n.getLeft_node();
         Node right = n.getRight_node();
         classifyNode(left, new_data_left, num_cat, num_numeric);
@@ -363,7 +380,7 @@ public class BinaryTree {
         }
     }
 
-    private void graphRecursionPrint(int depth, Node curnode) {
+    public void graphRecursionPrint(int depth, Node curnode) {
         String output = "";
         for (int i = depth; i > 0; i--) {
             output = output + " | ";
@@ -464,7 +481,7 @@ public class BinaryTree {
                     // Check if value at category is a key
                     if (classify_map.containsKey(value)) {
                         int[] classify_array = classify_map.get(value);
-                        if (data.getClassification().equals("0")) {
+                        if (data.getClassification().equals(Main.targetValue[0])) {
                             classify_array[0]++;
                         } else {
                             classify_array[1]++;
@@ -472,7 +489,7 @@ public class BinaryTree {
 
                     } else {
                         int[] classify_array = new int[]{0, 0};
-                        if (data.getClassification().equals("0")) {
+                        if (data.getClassification().equals(Main.targetValue[0])) {
                             classify_array[0]++;
                         } else {
                             classify_array[1]++;
@@ -484,7 +501,7 @@ public class BinaryTree {
                     Map<String, int[]> new_map = new Hashtable<>();
                     String value = cat_data.get(i);
                     int[] classify_array = new int[]{0, 0};
-                    if (data.getClassification().equals("0")) {
+                    if (data.getClassification().equals(Main.targetValue[0])) {
                         classify_array[0]++;
                     } else {
                         classify_array[1]++;
@@ -639,6 +656,9 @@ public class BinaryTree {
         public boolean isLeaf() {
             return isLeaf;
         }
+        public void setLeafValueOnly(boolean leaf) {
+            this.isLeaf = leaf;
+        }
 
         public void setLeaf(String assignedValue, int num_0, int num_1) {
             isLeaf = true;
@@ -646,6 +666,7 @@ public class BinaryTree {
             this.num_data_0 = num_0;
             this.num_data_1 = num_1;
         }
+
 
         public boolean isCategorical() {
             return isCategorical;
@@ -675,6 +696,15 @@ public class BinaryTree {
 
         public void setRight_node(Node right_node) {
             this.right_node = right_node;
+        }
+        public void setNumData(int num_0, int num_1){
+            this.num_data_0 = num_0;
+            this.num_data_1 = num_1;
+            if (num_data_0 > num_data_1){
+                this.assignedValue = Main.targetValue[0];
+            } else {
+                this.assignedValue = Main.targetValue[1];
+            }
         }
     }
 

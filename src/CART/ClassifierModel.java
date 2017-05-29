@@ -45,6 +45,29 @@ public class ClassifierModel {
         return (1.0*numCorrect)/(numCorrect + numIncorrect);
     }
 
+    public static BinaryTree crossValidate(BinaryTree tree, DataSource testdata){
+
+
+
+        for (BinaryTree.Node node: tree.node_list){
+            if (!node.isLeaf){
+                double initial_accuracy = ClassifierModel.checkAccuracy(tree, testdata);
+                //System.out.println("initial acc " + initial_accuracy);
+                node.setLeafValueOnly(true);
+                double after_accuracy = ClassifierModel.checkAccuracy(tree, testdata);
+                //System.out.println("New acc: " + after_accuracy);
+                if (initial_accuracy < after_accuracy){
+                    System.out.println("trimmed the tree");
+
+                } else {
+                    node.setLeafValueOnly(false);
+                }
+            }
+        }
+        return tree;
+
+    }
+
 
     // Method that computes the GINI coefictent
     public static double GINI(int success, int fail) {

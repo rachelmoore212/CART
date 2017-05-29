@@ -24,9 +24,11 @@ public class RandomForestModel {
         // Generating a bunch of datasources and trees based off of them
         for (int i = K; i>0; i--) {
             DataSource subdata = source.splitDataset(treeFactor, true);
+            System.out.println(subdata.getData().size());
 
             BinaryTree tree = new BinaryTree(subdata, minNodeSize);
-            tree.pruneTree(z);
+            //tree.pruneTree(z);
+            treeList.add(tree);
         }
     }
 
@@ -68,6 +70,7 @@ public class RandomForestModel {
             results.putIfAbsent(aresult, 0);
             results.put(aresult,results.get(aresult));
         }
+        System.out.println(results.entrySet());
 
         return results.entrySet().stream().max((entry1, entry2) -> entry1.getValue() >
                 entry2.getValue() ? 1 : -1).get().getKey();

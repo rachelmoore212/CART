@@ -6,18 +6,36 @@ import java.util.*;
  * Created by Rachel on 5/21/2017.
  */
 public class Main {
-    static int [] categorical_indexes = new int [] {2,3,4,6,7,8,9,10,11};
+    /*static int [] categorical_indexes = new int [] {2,3,4,6,7,8,9,10,11};
 
     static int [] numeric_indexes = new int [] {1,5,12,13,14,15,16,17,18,19,20,21,22,23};
+
+    static String[] targetValue = new String[]{"0","1"};
+    static int classifyIndex = 24;
+    static String datasource = "Data/CreditCards/credit-data.csv";
+    /*/
+    static int [] categorical_indexes = new int [] {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,
+            19,20,21,22};
+
+    static int [] numeric_indexes = new int [] {};
+
+    static String[] targetValue = new String[]{"e","p"};
+    static int classifyIndex = 0;
+    static String datasource = "Data/Mushroom/agaricus-lepiota.data";
+
+
+
     public static void main(String[] args){
 
 
-        System.out.println("hello world");
-        DataSource source = new DataSource("Data/CreditCards/credit-data.csv",numeric_indexes,
-                categorical_indexes, 24);
+        //System.out.println("hello world");
+        DataSource source = new DataSource(datasource,numeric_indexes,
+                categorical_indexes, classifyIndex);
 
-        Set<String> attributes = new HashSet<String>(Arrays.asList("meh","penis","vaginenis"));
-        System.out.println(BinaryTree.getSubsets(attributes));
+
+
+        //Set<String> attributes = new HashSet<String>(Arrays.asList("meh","penis","vaginenis"));
+        //System.out.println(BinaryTree.getSubsets(attributes));
 
         //System.out.println(ClassifierModel.GINI(100,0));
         //System.out.println(ClassifierModel.GINI(90,10));
@@ -27,18 +45,41 @@ public class Main {
         //DataSource first30pts = source.splitDataset2(30);
         //System.out.println(first30pts.getData().size());
 
+//        RandomForestModel model = new RandomForestModel(source,0.8,100,50,1.95);
+//        System.out.println(model.checkAccuracy(accuracyEvaluation));
 
+        BinaryTree tree = new BinaryTree(source, 10);
+        BinaryTree tree1 = ClassifierModel.crossValidate(tree, crossValidation);
+        //tree.pruneTree(1.95);
+        tree.graphRecursionPrint(0,tree.start_node);
+        System.out.println(ClassifierModel.checkAccuracy(tree,accuracyEvaluation));
+        System.out.println(ClassifierModel.checkAccuracy(tree1,accuracyEvaluation));
+
+
+//        int [] min_leafs = new int [] {1, 5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90,100};
+//        String results = "[";
+//        for (int i : min_leafs){
+//            System.out.println(i);
+//            BinaryTree tree = new BinaryTree(source, i);
+//            tree.pruneTree(1);
+//            results = results + Double.toString(ClassifierModel.checkAccuracy(tree,accuracyEvaluation)) + ", ";
+//        }
+//        System.out.println(results);
+        /*
         //ClassifierModel model = new ClassifierModel(crossValidation, 10);
-        BinaryTree tree = new BinaryTree(source, 30);
+        BinaryTree tree = new BinaryTree(source, 20);
 
         System.out.println(ClassifierModel.checkAccuracy(tree,accuracyEvaluation));
+        //tree.crossValidate(crossValidation);
         double z = 1.95;
         tree.pruneTree(z);
         System.out.println(ClassifierModel.checkAccuracy(tree,accuracyEvaluation));
+        BinaryTree new_tree = ClassifierModel.crossValidate(tree, crossValidation);
+        System.out.println(ClassifierModel.checkAccuracy(new_tree, accuracyEvaluation));
         //System.out.println(tree.start_node.isLeaf);
         //System.out.println(tree.start_node.getLeft_node());
 
-
+        */
         //mapData(source.getData());
     }
 
@@ -48,86 +89,4 @@ public class Main {
         }
     }*/
 
-    public void mapData(List<DataSource.Datapoint> datapoints){
-        // Our data
-
-
-        // Our dictionary that maps index of a category to a dictionary of values in that category
-        // to data that matches it
-        Map<Integer,Map<String,List<DataSource.Datapoint>>> categories_to_points = new Hashtable();
-
-        Map<Integer,Map<String, int[]>> categories_to_classifications = new Hashtable<>();
-
-        // Add each datapoint to the dictionary
-        for (DataSource.Datapoint data: datapoints){
-            List<String> cat_data = data.getCategoricalData();
-            for (int i = 0; i < cat_data.size(); i++){
-
-                // Check if category is a key
-                if(categories_to_points.containsKey(i)){
-
-                    Map<String,List<DataSource.Datapoint>> value_map = categories_to_points.get(i);
-                    String value = cat_data.get(i);
-
-                    // Check if value at category is a key
-                    if(value_map.containsKey(value)) {
-                        List<DataSource.Datapoint> object_list = value_map.get(value);
-                        object_list.add(data);
-                    // add it if its not
-                    } else {
-                        List<DataSource.Datapoint> new_list = new ArrayList<>();
-                        new_list.add(data);
-                        value_map.put(value, new_list);
-                    }
-                 // if category is not a key already, add it
-                } else {
-                    Map<String, List<DataSource.Datapoint>> new_map = new Hashtable<>();
-                    String value = cat_data.get(i);
-                    List<DataSource.Datapoint> new_list = new ArrayList<>();
-                    new_map.put(value, new_list);
-                    categories_to_points.put(i, new_map);
-                }
-
-                // Check if category is a key
-                if(categories_to_classifications.containsKey(i)){
-
-                    Map<String, int[]> classify_map = categories_to_classifications.get(i);
-                    String value = cat_data.get(i);
-
-                    // Check if value at category is a key
-                    if(classify_map.containsKey(value)) {
-                        int[] classify_array = classify_map.get(value);
-                        if (cat_data.getClass().equals("0")) {
-                            classify_array[0]++;
-                        } else {
-                            classify_array[1]++;
-                        }
-
-                    } else {
-                        int [] classify_array = new int [] {0,0};
-                        if (cat_data.getClass().equals("0")) {
-                            classify_array[0]++;
-                        } else {
-                            classify_array[1]++;
-                        }
-                        classify_map.put(value, classify_array);
-                    }
-                    // if category is not a key already, add it
-                } else {
-                    Map<String, int[]> new_map = new Hashtable<>();
-                    String value = cat_data.get(i);
-                    int [] classify_array = new int [] {0,0};
-                    if (cat_data.getClass().equals("0")) {
-                        classify_array[0]++;
-                    } else {
-                        classify_array[1]++;
-                    }
-                    new_map.put(value, classify_array);
-                    categories_to_classifications.put(i, new_map);
-                }
-
-            }
-        }
-
-    }
 }

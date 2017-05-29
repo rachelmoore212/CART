@@ -23,7 +23,7 @@ public class DataSource {
     public DataSource(String source, int[] numericalCategoires, int[] categoricalCategories, int
             classfiedVariable) {
         try {
-            CSVReader reader = new CSVReader(new FileReader("Data/CreditCards/credit-data.csv"));
+            CSVReader reader = new CSVReader(new FileReader(source));
 
             // Checking the rows of credit data
             boolean creditRows = true;
@@ -32,6 +32,10 @@ public class DataSource {
                 passedFirst = false;
                 creditRows = false;
             }
+            if (source.endsWith("agaricus-lepiota.data")) {
+                creditRows = false;
+            }
+
             dataCategorialNames = new String[categoricalCategories.length];
             dataNumericalnames = new String[numericalCategoires.length];
 //            List<Integer> toNumber = Arrays.stream(numericalCategoires).boxed().collect(Collectors
