@@ -19,12 +19,13 @@ public class CART {
     static int mushroom_classifyIndex = 0;
     static String mushroom_datasource = "Data/Mushroom/agaricus-lepiota.data";
 
-
+    /*
     static int [] adult_categorical_indexes = new int [] {1,3,5,6,7,8,9,13};
     static int [] adult_numeric_indexes = new int [] {0,2,4,10,11,12};
     static String[] adult_targetValue = new String[]{"<=50K",">=50K"};
     static int adult_classifyIndex = 14;
     static String adult_datasource = "Data/Money/adult.data";
+    */
 
 
     static int [] cancer_categorical_indexes = new int [] {};
@@ -59,12 +60,12 @@ public class CART {
                 classifyIndex = mushroom_classifyIndex;
                 datasource = mushroom_datasource;
 
-            } else if (args[0].equals("adult")) {
-                categorical_indexes = adult_categorical_indexes;
-                numeric_indexes = adult_numeric_indexes;
-                targetValue = adult_targetValue;
-                classifyIndex = adult_classifyIndex;
-                datasource = adult_datasource;
+//            } else if (args[0].equals("adult")) {
+//                categorical_indexes = adult_categorical_indexes;
+//                numeric_indexes = adult_numeric_indexes;
+//                targetValue = adult_targetValue;
+//                classifyIndex = adult_classifyIndex;
+//                datasource = adult_datasource;
 
             } else if (args[0].equals("cancer")) {
                 categorical_indexes = cancer_categorical_indexes;
@@ -87,36 +88,37 @@ public class CART {
                 System.exit(1);
             }
 
+            if (args.length>2) {
+                // Setting the t values
+                if ((args.length == 6) || ((args.length == 4) && (args[2].equals("randomForest")))) {
+                    randomForest = true;
+                    numTrees = Integer.parseInt(args[args.length - 1]);
+                }
 
-            // Setting the t values
-            if ((args.length == 6)||((args.length==4)&& (args[2].equals("randomForest")))) {
-                randomForest = true;
-                numTrees = Integer.parseInt(args[args.length-1]);
-            }
+
+                //pruning values
+                if (!((args.length == 4) && (args[2].equals("randomForest")))) {
+                    try {
+                        if (args[2].equals("crossValidation")) {
+                            pruning = pruningmethod.crossValidation;
+                            crossValidationPercent = Double.parseDouble(args[3]);
+
+                        } else if (args[2].equals("pessimistic")) {
+                            pruning = pruningmethod.pessimistic;
+                            Zvalue = Double.parseDouble(args[3]);
+
+                        } else {
+                            printHelpMessage();
+                            System.exit(1);
+                        }
 
 
-            //pruning values
-            if (!((args.length==4)&& (args[2].equals("randomForest")))) {
-                try {
-                    if (args[2].equals("crossValidation")) {
-                        pruning = pruningmethod.crossValidation;
-                        crossValidationPercent = Double.parseDouble(args[3]);
-
-                    } else if (args[2].equals("pessimistic")) {
-                        pruning = pruningmethod.pessimistic;
-                        Zvalue = Double.parseDouble(args[3]);
-
-                    } else {
+                    } catch (NumberFormatException e) {
+                        System.out.print("please provide a valid pruning parameter in decimal format " +
+                                "format");
                         printHelpMessage();
                         System.exit(1);
                     }
-
-
-                } catch (NumberFormatException e) {
-                    System.out.print("please provide a valid pruning parameter in decimal format " +
-                            "format");
-                    printHelpMessage();
-                    System.exit(1);
                 }
             }
 
@@ -141,9 +143,9 @@ public class CART {
         TreeModel model;
         // Actual execution of the code
         if (randomForest) {
-            model = new RandomForestModel(source,0.10,numTrees,min_leaf_size);
+            model = new RandomForestModel(source,0.30,numTrees,min_leaf_size);
 
-        } else model = new ClassifierModel(source, 100);
+        } else model = new ClassifierModel(source, min_leaf_size);
 
         // Running any pruning techniques on the dataset
         if (pruning==pruningmethod.crossValidation) {
@@ -159,14 +161,14 @@ public class CART {
         }
         model.printTree();
 
-        System.out.println("\nFinal Cross Validation Accuracy: "+ model.checkAccuracy
+        System.out.println("\nFinal Accuracy over 20% test data: "+ model.checkAccuracy
                 (accuracyEvaluation));
 
     }
 
     private static void printHelpMessage() {
         System.out.println("Please include input in the following format: $ CART [credit| " +
-                "mushroom| adult] min_leaf_size (optional)[crossValidation %ofTestToUse| " +
+                "mushroom| cancer] min_leaf_size (optional)[crossValidation %ofTestToUse| " +
                 "pessimistic Z] (optional)[randomForest num_trees]" +
                 " ]");
     }

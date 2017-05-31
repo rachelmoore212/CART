@@ -28,6 +28,7 @@ public class RandomForestModel implements TreeModel {
 
             BinaryTree tree = new BinaryTree(subdata, minNodeSize);
             treeList.add(tree);
+            System.out.println("Finished building a tree, "+i+" trees left to build");
         }
     }
 
@@ -92,7 +93,6 @@ public class RandomForestModel implements TreeModel {
             results.putIfAbsent(aresult, 0);
             results.put(aresult,results.get(aresult));
         }
-        System.out.println(results.entrySet());
 
         return results.entrySet().stream().max((entry1, entry2) -> entry1.getValue() >
                 entry2.getValue() ? 1 : -1).get().getKey();

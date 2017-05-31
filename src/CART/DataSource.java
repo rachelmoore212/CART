@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Created by jamie on 5/21/17.
+ * Datasource object that handles splitting of datapoints
  */
 public class DataSource {
 
@@ -48,7 +48,6 @@ public class DataSource {
                 if (passedFirst) {
                     if (creditRows) {
 
-                        System.out.println(s);
                         //Ignoring missing data
                         if (!Arrays.asList(s).contains("")) {
 
@@ -80,7 +79,6 @@ public class DataSource {
                     passedFirst = true;
                 }
             }
-            //System.out.print(data.toString());
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
@@ -118,22 +116,11 @@ public class DataSource {
         else return null;
     }
 
-    //
-    public DataSource splitDataset2(int number) {
-
-        List<Datapoint> newData = data.subList(0, number);
-
-        DataSource output = new DataSource(newData, dataCategorialNames, dataNumericalnames);
-        return output;
-
-    }
-
-    //public List<Datapoint> getPoints(int [] indexes){
-
-        //return data.get(indexes);
-    //}
 
 
+    /**
+     * Datapoint class that stores a single datapoint
+     */
     public final class Datapoint {
         List<Double> numericalData;
         List<String> categoricalData;
