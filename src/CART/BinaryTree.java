@@ -58,10 +58,10 @@ public class BinaryTree {
                             int new_1 = node_left.num_data_1 + node_right.num_data_1;
                             String classify;
                             if (new_0 > new_1){
-                                classify = Main.targetValue[0];
+                                classify = CART.CART.targetValue[0];
 
                             } else {
-                                classify = Main.targetValue[1];
+                                classify = CART.CART.targetValue[1];
                             }
                             node.setLeaf(classify, new_0, new_1);
                             continue;
@@ -202,7 +202,7 @@ public class BinaryTree {
 
             double lastVlaue = -1212341.1234123;//TODO bullshit
             for(int pointer = 0; pointer < datapoints.size(); pointer++) {
-                if (datapoints.get(pointer).getClassification().equals(Main.targetValue[0])) {
+                if (datapoints.get(pointer).getClassification().equals(CART.CART.targetValue[0])) {
                     sum_left_0++;
                     sum_right_0--;
                 } else {
@@ -239,9 +239,9 @@ public class BinaryTree {
         // Here will be code for finding best numeric split
         //if (!(most_min_gini<ClassifierModel.GINI(canonvalues[0],canonvalues[1]))) {
         if (most_max_gini < 0) {
-            String assignedValue = Main.targetValue[1];
+            String assignedValue = CART.CART.targetValue[1];
             if (canonvalues[0]>canonvalues[1]) {//TODO make this robust for many assignments
-                assignedValue = Main.targetValue[0];
+                assignedValue = CART.CART.targetValue[0];
             }
             n.setLeaf(assignedValue, canonvalues[0],canonvalues[1]);
            // System.out.println("made a leaf node");
@@ -262,7 +262,7 @@ public class BinaryTree {
             new_data_right = new ArrayList<>();
 
             for (DataSource.Datapoint data : datapoints) {
-                if (data.getClassification()==Main.targetValue[0]){
+                if (data.getClassification()== CART.CART.targetValue[0]){
                     num_0++;
                 } else {
                     num_1++;
@@ -281,7 +281,7 @@ public class BinaryTree {
             new_data_left = new ArrayList<>();
             new_data_right = new ArrayList<>();
             for (DataSource.Datapoint data : datapoints) {
-                if (data.getClassification()==Main.targetValue[0]){
+                if (data.getClassification()== CART.CART.targetValue[0]){
                     num_0++;
 
                 } else {
@@ -481,7 +481,7 @@ public class BinaryTree {
                     // Check if value at category is a key
                     if (classify_map.containsKey(value)) {
                         int[] classify_array = classify_map.get(value);
-                        if (data.getClassification().equals(Main.targetValue[0])) {
+                        if (data.getClassification().equals(CART.CART.targetValue[0])) {
                             classify_array[0]++;
                         } else {
                             classify_array[1]++;
@@ -489,7 +489,7 @@ public class BinaryTree {
 
                     } else {
                         int[] classify_array = new int[]{0, 0};
-                        if (data.getClassification().equals(Main.targetValue[0])) {
+                        if (data.getClassification().equals(CART.CART.targetValue[0])) {
                             classify_array[0]++;
                         } else {
                             classify_array[1]++;
@@ -501,7 +501,7 @@ public class BinaryTree {
                     Map<String, int[]> new_map = new Hashtable<>();
                     String value = cat_data.get(i);
                     int[] classify_array = new int[]{0, 0};
-                    if (data.getClassification().equals(Main.targetValue[0])) {
+                    if (data.getClassification().equals(CART.CART.targetValue[0])) {
                         classify_array[0]++;
                     } else {
                         classify_array[1]++;
@@ -701,9 +701,9 @@ public class BinaryTree {
             this.num_data_0 = num_0;
             this.num_data_1 = num_1;
             if (num_data_0 > num_data_1){
-                this.assignedValue = Main.targetValue[0];
+                this.assignedValue = CART.CART.targetValue[0];
             } else {
-                this.assignedValue = Main.targetValue[1];
+                this.assignedValue = CART.CART.targetValue[1];
             }
         }
     }
