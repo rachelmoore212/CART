@@ -24,14 +24,22 @@ public class Main {
     static int classifyIndex = 0;
     static String datasource = "Data/Mushroom/agaricus-lepiota.data";
     */
-
-    static int [] categorical_indexes = new int [] {1,3,5,6,7,8,9,13};
+    /*
+    static int [] categorical_indexes = new int [] {1,3,5,6,7,8,9,10,13};
 
     static int [] numeric_indexes = new int [] {0,2,4,10,11,12};
 
     static String[] targetValue = new String[]{"<=50K",">=50K"};
     static int classifyIndex = 14;
     static String datasource = "Data/Money/adult.data";
+    */
+    static int [] categorical_indexes = new int [] {};
+
+    static int [] numeric_indexes = new int [] {2,3,4,5,6,7,8,9,10,11};
+
+    static String[] targetValue = new String[]{"M","B"};
+    static int classifyIndex = 1;
+    static String datasource = "Data/Cancer/breast_cancer.csv";
 
 
 
