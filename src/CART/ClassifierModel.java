@@ -67,7 +67,6 @@ public class ClassifierModel implements TreeModel {
                 double after_accuracy = ClassifierModel.checkAccuracy(tree, testdata);
                 //System.out.println("New acc: " + after_accuracy);
                 if (initial_accuracy < after_accuracy){
-                    System.out.println("trimmed the tree");
 
                 } else {
                     node.setLeafValueOnly(false);
@@ -88,11 +87,6 @@ public class ClassifierModel implements TreeModel {
         return 1.0 - (percent_fail*percent_fail) - (percent_success*percent_success);
     }
 
-
-    //Method that classifies the data after its done
-    public String ClassifyDatapoint(DataSource.Datapoint point) {
-        return "FOOOOOOOOOOOOO";
-    }
 
     public static double pessemisticError(int wrong, int total, double z){
         //System.out.println("wrong: "+wrong+"  total:"+total+"   z:"+z);

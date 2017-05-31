@@ -140,6 +140,7 @@ public class CART {
         }
 
 
+        System.out.println("Building Model...");
         TreeModel model;
         // Actual execution of the code
         if (randomForest) {
@@ -147,17 +148,22 @@ public class CART {
 
         } else model = new ClassifierModel(source, min_leaf_size);
 
+        System.out.println("Finished Building Model");
         // Running any pruning techniques on the dataset
         if (pruning==pruningmethod.crossValidation) {
+            System.out.println("Pruning Tree...");
             model.crossValidate(crossValidation);
+            System.out.println("Finished Pruning Tree");
 
         } else if (pruning==pruningmethod.pessimistic) {
+            System.out.println("Pruning tree...");
             model.pessimisticPrune(Zvalue);
+            System.out.println("Finished Pruning Tree");
         }
 
         // Printing out the resulting tree
         if (!randomForest) {
-            System.out.println("A graphical representation of the tree:");
+            System.out.println("\nA graphical representation of the tree:");
         }
         model.printTree();
 
