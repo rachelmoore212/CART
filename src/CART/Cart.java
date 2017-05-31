@@ -1,7 +1,5 @@
 package CART;
 
-import java.util.*;
-
 /**
  * Main class from which the code is expected to be executed
  */
@@ -29,6 +27,13 @@ public class CART {
     static String adult_datasource = "Data/Money/adult.data";
 
 
+    static int [] cancer_categorical_indexes = new int [] {};
+    static int [] cancer_numeric_indexes = new int [] {2,3,4,5,6,7,8,9,10,11};
+    static String[] cancer_targetValue = new String[]{"M","B"};
+    static int cancer_classifyIndex = 1;
+    static String cancer_datasource = "Data/Cancer/breast_cancer.csv";
+
+
     /**
      * Command line arguments
      * @param args
@@ -36,9 +41,10 @@ public class CART {
     public static void main(String[] args){
         int min_leaf_size = 50;
         pruningmethod pruning = pruningmethod.noprune;
-        double Zvalue;
-        double crossValidationPercent;
+        double Zvalue = 0;
+        double crossValidationPercent = 0;
         boolean randomForest = false;
+        int numTrees = 1;
 
 
         // Parsing of command line arguments
@@ -60,6 +66,13 @@ public class CART {
                 classifyIndex = adult_classifyIndex;
                 datasource = adult_datasource;
 
+            } else if (args[0].equals("cancer")) {
+                categorical_indexes = cancer_categorical_indexes;
+                numeric_indexes = cancer_numeric_indexes;
+                targetValue = cancer_targetValue;
+                classifyIndex = cancer_classifyIndex;
+                datasource = cancer_datasource;
+
             } else {
                 printHelpMessage();
                 System.exit(1);
@@ -74,37 +87,38 @@ public class CART {
                 System.exit(1);
             }
 
-            // Setting the pruning values
+
+            // Setting the t values
             if ((args.length == 6)||((args.length==4)&& (args[2].equals("randomForest")))) {
-
-
+                randomForest = true;
+                numTrees = Integer.parseInt(args[args.length-1]);
             }
 
 
-            try {
-                if (args[2].equals("crossValidation")) {
-                    pruning = pruningmethod.crossValidation;
-                    crossValidationPercent = Double.parseDouble(args[3]);
+            //pruning values
+            if (!((args.length==4)&& (args[2].equals("randomForest")))) {
+                try {
+                    if (args[2].equals("crossValidation")) {
+                        pruning = pruningmethod.crossValidation;
+                        crossValidationPercent = Double.parseDouble(args[3]);
 
-                } else if (args[2].equals("pessimistic")) {
-                    pruning = pruningmethod.pessimistic;
-                    Zvalue = Double.parseDouble(args[3]);
+                    } else if (args[2].equals("pessimistic")) {
+                        pruning = pruningmethod.pessimistic;
+                        Zvalue = Double.parseDouble(args[3]);
 
-                } else {
+                    } else {
+                        printHelpMessage();
+                        System.exit(1);
+                    }
+
+
+                } catch (NumberFormatException e) {
+                    System.out.print("please provide a valid pruning parameter in decimal format " +
+                            "format");
                     printHelpMessage();
                     System.exit(1);
                 }
-
-
-            } catch (NumberFormatException e) {
-                System.out.print("please provide a valid pruning parameter in decimal format " +
-                        "format");
-                printHelpMessage();
-                System.exit(1);
             }
-
-
-
 
         } else {
             printHelpMessage();
@@ -117,49 +131,37 @@ public class CART {
 
         // Splitting off a portion of the dataset for accuracy evalution
         DataSource accuracyEvaluation = source.splitDataset(0.2, false);
-        DataSource crossValidation;
+        DataSource crossValidation=null;
 
         if (pruning==pruningmethod.crossValidation) {
-            crossValidation = source.splitDataset(0.2, false);
+            crossValidation = source.splitDataset(crossValidationPercent, false);
         }
 
 
-//        RandomForestModel model = new RandomForestModel(source,0.8,100,50,1.95);
-//        System.out.println(model.checkAccuracy(accuracyEvaluation));
+        TreeModel model;
+        // Actual execution of the code
+        if (randomForest) {
+            model = new RandomForestModel(source,0.10,numTrees,min_leaf_size);
 
-        BinaryTree tree = new BinaryTree(source, 100);
-        BinaryTree tree1 = ClassifierModel.crossValidate(tree, crossValidation);
-        //tree.pruneTree(1.95);
-        tree.graphRecursionPrint(0,tree.start_node);
-        System.out.println(ClassifierModel.checkAccuracy(tree,accuracyEvaluation));
-        System.out.println(ClassifierModel.checkAccuracy(tree1,accuracyEvaluation));
+        } else model = new ClassifierModel(source, 100);
 
+        // Running any pruning techniques on the dataset
+        if (pruning==pruningmethod.crossValidation) {
+            model.crossValidate(crossValidation);
 
-//        int [] min_leafs = new int [] {1, 5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90,100};
-//        String results = "[";
-//        for (int i : min_leafs){
-//            System.out.println(i);
-//            BinaryTree tree = new BinaryTree(source, i);
-//            tree.pruneTree(1);
-//            results = results + Double.toString(ClassifierModel.checkAccuracy(tree,accuracyEvaluation)) + ", ";
-//        }
-//        System.out.println(results);
-        /*
-        //ClassifierModel model = new ClassifierModel(crossValidation, 10);
-        BinaryTree tree = new BinaryTree(source, 20);
+        } else if (pruning==pruningmethod.pessimistic) {
+            model.pessimisticPrune(Zvalue);
+        }
 
-        System.out.println(ClassifierModel.checkAccuracy(tree,accuracyEvaluation));
-        //tree.crossValidate(crossValidation);
-        double z = 1.95;
-        tree.pruneTree(z);
-        System.out.println(ClassifierModel.checkAccuracy(tree,accuracyEvaluation));
-        BinaryTree new_tree = ClassifierModel.crossValidate(tree, crossValidation);
-        System.out.println(ClassifierModel.checkAccuracy(new_tree, accuracyEvaluation));
-        //System.out.println(tree.start_node.isLeaf);
-        //System.out.println(tree.start_node.getLeft_node());
+        // Printing out the resulting tree
+        if (!randomForest) {
+            System.out.println("A graphical representation of the tree:");
+        }
+        model.printTree();
 
-        */
-        //mapData(source.getData());
+        System.out.println("\nFinal Cross Validation Accuracy: "+ model.checkAccuracy
+                (accuracyEvaluation));
+
     }
 
     private static void printHelpMessage() {

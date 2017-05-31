@@ -6,16 +6,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by jamie on 5/28/17.
+ * A random forest model which consists of many tree models that vote on the correct answer
  */
-public class RandomForestModel {
+public class RandomForestModel implements TreeModel {
     List<BinaryTree> treeList;
     double treeFactor;
     DataSource source;
     double minNodeSize;
 
 
-    public RandomForestModel(DataSource source, double treeFactor, int K, int minNodeSize, double z) {
+    public RandomForestModel(DataSource source, double treeFactor, int K, int minNodeSize) {
         this.source = source;
         this.treeFactor = treeFactor;
         this.treeList = new ArrayList<>();
@@ -27,13 +27,13 @@ public class RandomForestModel {
             System.out.println(subdata.getData().size());
 
             BinaryTree tree = new BinaryTree(subdata, minNodeSize);
-            //tree.pruneTree(z);
             treeList.add(tree);
         }
     }
 
 
     /**
+     * Implementation of the model that checks the accuracy all the trees in the dataset by voting
      *
      * @param testData
      * @return
@@ -52,6 +52,28 @@ public class RandomForestModel {
             }
         }
         return (1.0 * numCorrect) / (numCorrect + numIncorrect);
+    }
+
+    /**
+     * Implements interface method to cross validation prune every tree
+     * @param testdata
+     */
+    public void crossValidate(DataSource testdata) {
+        for (int i = 0; i<treeList.size(); i++){
+            treeList.set(i, ClassifierModel.crossValidateTree(testdata,treeList.get(i)));
+        }
+    }
+
+
+    public void pessimisticPrune(double z) {
+        for (BinaryTree t : treeList){
+            t.pruneTree(z, true);
+        }
+    }
+
+    @Override
+    public void printTree() {
+        System.out.println("Forrest with a total of "+treeList.size()+" trees in the model");
     }
 
     /**

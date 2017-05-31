@@ -1,35 +1,26 @@
 package CART;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-
 /**
- * Created by jamie on 5/25/17.
+ * Model class that serves to hold the necessary information about the tree
  */
-public class ClassifierModel {
+public class ClassifierModel implements TreeModel {
     DataSource dataSource;
-    Node classiferRoot;
+    BinaryTree tree;
 
     //Constructs the model and trains it on the dataset, where K is the min number of points in a
     // bin
     public ClassifierModel(DataSource d, int K) {
         this.dataSource = d;
-        //classiferRoot = recursiveClassify(d.getData(),K);
+        tree = new BinaryTree(d, K);
     }
-
-    //Method that runs the node tree thing to do the complmacated mathematitics
-    /*private Node recursiveClassify(List<DataSource.Datapoint> nodeAssignments ,int K) {
-
-
-        return newNode();
-    }*/
 
     /**
      * Method that evaluates the overall accuracy of a model on some test dataset
      */
-    public static double checkAccuracy(BinaryTree tree, DataSource testData) {
+    public double checkAccuracy(DataSource testData) {
+        return checkAccuracy(this.tree, testData);
+    }
+    public static double checkAccuracy( BinaryTree tree, DataSource testData) {
         int numCorrect = 0;
         int numIncorrect = 0;
 
@@ -45,9 +36,28 @@ public class ClassifierModel {
         return (1.0*numCorrect)/(numCorrect + numIncorrect);
     }
 
-    public static BinaryTree crossValidate(BinaryTree tree, DataSource testdata){
+
+    public void crossValidate(DataSource testdata) {
+        tree = crossValidateTree(testdata, tree);
+    }
 
 
+    public void pessimisticPrune(double z) {
+        tree.pruneTree(z, true);
+    }
+
+    @Override
+    public void printTree() {
+        tree.graphRecursionPrint(0, tree.start_node);
+    }
+
+    /**
+     * Method that performs a tree crossvalidation given a tree
+     * @param testdata
+     * @param tree
+     * @return
+     */
+    public static BinaryTree crossValidateTree(DataSource testdata, BinaryTree tree){
 
         for (BinaryTree.Node node: tree.node_list){
             if (!node.isLeaf){
@@ -69,15 +79,13 @@ public class ClassifierModel {
     }
 
 
+
+
     // Method that computes the GINI coefictent
     public static double GINI(int success, int fail) {
         double percent_success = (1.0 * success / (success + fail));
         double percent_fail = (1.0 * fail / (success + fail));
         return 1.0 - (percent_fail*percent_fail) - (percent_success*percent_success);
-        //System.out.println((1.0 * success / (success + fail)) * (1.0 - (1.0 *success / (success + fail))));
-        //System.out.println((1.0 * fail / (success + fail)) * (1.0 - (1.0 * fail / (success + fail))));
-        //return (1.0 * success / (success + fail)) * (1.0 - (1.0 *success / (success + fail))) +
-        //        (1.0 * fail / (success + fail)) * (1.0 - (1.0 *fail / (success + fail)));
     }
 
 

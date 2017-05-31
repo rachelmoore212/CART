@@ -23,7 +23,7 @@ public class DataSource {
             CSVReader reader = new CSVReader(new FileReader(source));
 
             // Checking the rows of credit data
-            boolean creditRows = true;
+            boolean creditRows = false;
             boolean passedFirst = true;
             if (source.endsWith("credit-data.csv")) {
                 passedFirst = false;
@@ -168,7 +168,7 @@ public class DataSource {
     }
 
     public static String[] getDataCategorialNames() {
-        return dataCategorialNames;
+        return (dataCategorialNames==null?new String[0]:dataCategorialNames);
     }
 
     public List<Datapoint> getData() {
